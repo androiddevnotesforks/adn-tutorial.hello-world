@@ -1,5 +1,10 @@
 console.log('This is a popup!');
 
+// Focus on the prompt input field when popup opens
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('promptInput').focus();
+});
+
 // URL mapping
 const URLS = {
   grok: (prompt) => `https://grok.com/chat?q=${prompt}`,
