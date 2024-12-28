@@ -1,8 +1,22 @@
 <html>
-  <body>
+  <body style="min-width: 300px; padding: 10px;">
     <h1>Hello Bro!</h1>
     <div>
       <input type="text" id="promptInput" placeholder="Enter your prompt">
+      
+      <div style="margin: 10px 0;">
+        <div style="margin-bottom: 5px;">Select websites (1-2):</div>
+        <label style="display: block; margin: 5px 0;">
+          <input type="checkbox" name="sites" value="grok" checked> Grok
+        </label>
+        <label style="display: block; margin: 5px 0;">
+          <input type="checkbox" name="sites" value="x"> X/Twitter Grok
+        </label>
+        <label style="display: block; margin: 5px 0;">
+          <input type="checkbox" name="sites" value="chatgpt"> ChatGPT
+        </label>
+      </div>
+
       <div style="margin: 10px 0;">
         <label>
           <input type="radio" name="mode" value="normal" checked> Normal Tabs
@@ -11,7 +25,8 @@
           <input type="radio" name="mode" value="split"> Split Screen
         </label>
       </div>
-      <button id="sendButton">Send to Grok</button>
+
+      <button id="sendButton">Send to AI</button>
     </div>
     <script src="popup.js"></script>
   </body>
