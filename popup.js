@@ -1,8 +1,44 @@
 console.log('This is a popup!');
 
+// Function to save selected sites
+function saveSelectedSites() {
+  const selectedSites = Array.from(document.querySelectorAll('input[name="sites"]:checked'))
+    .map(cb => cb.value);
+  chrome.storage.local.set({ selectedSites });
+}
+
+// Function to restore selected sites
+function restoreSelectedSites() {
+  // First uncheck all checkboxes
+  document.querySelectorAll('input[name="sites"]').forEach(checkbox => {
+    checkbox.checked = false;
+  });
+  
+  // Then restore saved selections or use defaults
+  chrome.storage.local.get(['selectedSites'], (result) => {
+    if (result.selectedSites && result.selectedSites.length > 0) {
+      // Use saved selections if they exist
+      result.selectedSites.forEach(site => {
+        const checkbox = document.querySelector(`input[value="${site}"]`);
+        if (checkbox) checkbox.checked = true;
+      });
+    } else {
+      // Use defaults only if no saved selections exist
+      const defaultSites = ['grok', 'chatgpt'];
+      defaultSites.forEach(site => {
+        const checkbox = document.querySelector(`input[value="${site}"]`);
+        if (checkbox) checkbox.checked = true;
+      });
+      // Save these defaults
+      saveSelectedSites();
+    }
+  });
+}
+
 // Focus on the prompt input field when popup opens
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('promptInput').focus();
+  restoreSelectedSites();
 });
 
 // URL mapping
@@ -19,6 +55,7 @@ document.querySelectorAll('input[name="sites"]').forEach(checkbox => {
     if (checked.length > 2) {
       checkbox.checked = false;
     }
+    saveSelectedSites();
   });
 });
 

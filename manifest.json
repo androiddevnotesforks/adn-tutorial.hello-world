@@ -23,7 +23,8 @@
   },
   "permissions": [
     "tabs",
-    "windows"
+    "windows",
+    "storage"
   ],
   "host_permissions": [
     "https://www.grok.x.ai/*",
