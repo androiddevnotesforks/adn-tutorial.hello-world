@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="4" y="4" width="120" height="120" rx="20" fill="#4A90E2"/>
+  
+  <!-- Split line -->
+  <rect x="62" y="14" width="4" height="100" fill="white"/>
+  
+  <!-- Left side AI icon -->
+  <circle cx="32" cy="64" r="16" fill="white"/>
+  <path d="M24 64 L40 64 M32 56 L32 72" stroke="#4A90E2" stroke-width="4"/>
+  
+  <!-- Right side AI icon -->
+  <circle cx="96" cy="64" r="16" fill="white"/>
+  <path d="M88 64 L104 64 M96 56 L96 72" stroke="#4A90E2" stroke-width="4"/>
+</svg> 
