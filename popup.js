@@ -1,6 +1,7 @@
 console.log('This is a popup!');
 
-document.getElementById('sendButton').addEventListener('click', async () => {
+// Function to execute the prompt
+async function executePrompt() {
   const prompt = document.getElementById('promptInput').value;
   if (!prompt) return;
 
@@ -68,4 +69,15 @@ document.getElementById('sendButton').addEventListener('click', async () => {
   } catch (error) {
     console.error('Error creating windows:', error);
   }
+}
+
+// Listen for Enter key on input
+document.getElementById('promptInput').addEventListener('keypress', (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    executePrompt();
+  }
 });
+
+// Listen for button click
+document.getElementById('sendButton').addEventListener('click', executePrompt);
