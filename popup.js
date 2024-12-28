@@ -1,21 +1,23 @@
 console.log('This is a popup!');
 
-// Function to save selected sites
-function saveSelectedSites() {
+// Function to save selected sites and mode
+function saveSettings() {
   const selectedSites = Array.from(document.querySelectorAll('input[name="sites"]:checked'))
     .map(cb => cb.value);
-  chrome.storage.local.set({ selectedSites });
+  const selectedMode = document.querySelector('input[name="mode"]:checked').value;
+  chrome.storage.local.set({ selectedSites, selectedMode });
 }
 
-// Function to restore selected sites
-function restoreSelectedSites() {
+// Function to restore selected sites and mode
+function restoreSettings() {
   // First uncheck all checkboxes
   document.querySelectorAll('input[name="sites"]').forEach(checkbox => {
     checkbox.checked = false;
   });
   
-  // Then restore saved selections or use defaults
-  chrome.storage.local.get(['selectedSites'], (result) => {
+  // Restore saved selections and mode
+  chrome.storage.local.get(['selectedSites', 'selectedMode'], (result) => {
+    // Handle site selections
     if (result.selectedSites && result.selectedSites.length > 0) {
       // Use saved selections if they exist
       result.selectedSites.forEach(site => {
@@ -29,8 +31,21 @@ function restoreSelectedSites() {
         const checkbox = document.querySelector(`input[value="${site}"]`);
         if (checkbox) checkbox.checked = true;
       });
-      // Save these defaults
-      saveSelectedSites();
+    }
+
+    // Handle display mode
+    if (result.selectedMode) {
+      const modeInput = document.querySelector(`input[name="mode"][value="${result.selectedMode}"]`);
+      if (modeInput) modeInput.checked = true;
+    } else {
+      // Default to split mode if no saved preference
+      const splitModeInput = document.querySelector('input[name="mode"][value="split"]');
+      if (splitModeInput) splitModeInput.checked = true;
+    }
+
+    // Save initial settings if this was the first load
+    if (!result.selectedSites || !result.selectedMode) {
+      saveSettings();
     }
   });
 }
@@ -38,7 +53,7 @@ function restoreSelectedSites() {
 // Focus on the prompt input field when popup opens
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('promptInput').focus();
-  restoreSelectedSites();
+  restoreSettings();
 });
 
 // URL mapping
@@ -55,8 +70,13 @@ document.querySelectorAll('input[name="sites"]').forEach(checkbox => {
     if (checked.length > 2) {
       checkbox.checked = false;
     }
-    saveSelectedSites();
+    saveSettings();
   });
+});
+
+// Add event listener for mode changes
+document.querySelectorAll('input[name="mode"]').forEach(radio => {
+  radio.addEventListener('change', saveSettings);
 });
 
 // Function to execute the prompt
