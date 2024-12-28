@@ -3,6 +3,14 @@
     <h1>Hello Bro!</h1>
     <div>
       <input type="text" id="promptInput" placeholder="Enter your prompt">
+      <div style="margin: 10px 0;">
+        <label>
+          <input type="radio" name="mode" value="normal" checked> Normal Tabs
+        </label>
+        <label style="margin-left: 10px;">
+          <input type="radio" name="mode" value="split"> Split Screen
+        </label>
+      </div>
       <button id="sendButton">Send to Grok</button>
     </div>
     <script src="popup.js"></script>

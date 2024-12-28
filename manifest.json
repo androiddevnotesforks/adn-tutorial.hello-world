@@ -7,6 +7,9 @@
     "default_popup": "hello.html",
     "default_icon": "hello_extensions.png"
   },
+  "background": {
+    "service_worker": "background.js"
+  },
   "permissions": ["tabs", "windows", "tabGroups"],
   "host_permissions": ["https://grok.com/*", "https://x.com/*"]
 }
