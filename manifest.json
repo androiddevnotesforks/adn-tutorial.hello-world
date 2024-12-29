@@ -30,6 +30,7 @@
     "https://www.grok.x.ai/*",
     "https://x.com/*",
     "https://chat.openai.com/*",
-    "https://www.perplexity.ai/*"
+    "https://www.perplexity.ai/*",
+    "https://www.google.com/*"
   ]
 }
