@@ -121,45 +121,59 @@ async function executePrompt() {
         // Two windows side by side
         const windowWidth = Math.floor(screenWidth / 2);
         
-        // Create first window
-        const firstWindow = await chrome.windows.create({
-          url: URLS[selectedSites[0]](encodedPrompt),
-          left: 0,
-          top: 0,
-          width: windowWidth,
-          height: screenHeight,
-          state: 'normal'
-        });
-
-        // Create second window
-        const secondWindow = await chrome.windows.create({
-          url: URLS[selectedSites[1]](encodedPrompt),
-          left: windowWidth,
-          top: 0,
-          width: windowWidth,
-          height: screenHeight,
-          state: 'normal'
-        });
-
-        // Wait a bit for windows to settle
-        setTimeout(async () => {
-          // Ensure windows are positioned correctly
-          await chrome.windows.update(firstWindow.id, {
+        try {
+          // Create first window
+          const firstWindow = await chrome.windows.create({
+            url: URLS[selectedSites[0]](encodedPrompt),
             left: 0,
             top: 0,
             width: windowWidth,
             height: screenHeight,
             state: 'normal'
           });
-          
-          await chrome.windows.update(secondWindow.id, {
+
+          // Create second window
+          const secondWindow = await chrome.windows.create({
+            url: URLS[selectedSites[1]](encodedPrompt),
             left: windowWidth,
             top: 0,
             width: windowWidth,
             height: screenHeight,
             state: 'normal'
           });
-        }, 500);
+
+          // Function to position windows with retry
+          const positionWindows = async (attempt = 1) => {
+            try {
+              await Promise.all([
+                chrome.windows.update(firstWindow.id, {
+                  left: 0,
+                  top: 0,
+                  width: windowWidth,
+                  height: screenHeight,
+                  state: 'normal'
+                }),
+                chrome.windows.update(secondWindow.id, {
+                  left: windowWidth,
+                  top: 0,
+                  width: windowWidth,
+                  height: screenHeight,
+                  state: 'normal'
+                })
+              ]);
+            } catch (error) {
+              if (attempt < 3) {
+                // Retry up to 3 times with increasing delay
+                setTimeout(() => positionWindows(attempt + 1), 750 * attempt);
+              }
+            }
+          };
+
+          // Initial positioning with delay to let windows settle
+          setTimeout(() => positionWindows(), 750);
+        } catch (error) {
+          console.error('Error in split screen:', error);
+        }
       }
     }
   } catch (error) {
