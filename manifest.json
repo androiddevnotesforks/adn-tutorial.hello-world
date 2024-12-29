@@ -32,5 +32,14 @@
     "https://chat.openai.com/*",
     "https://www.perplexity.ai/*",
     "https://www.google.com/*"
-  ]
+  ],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+H",
+        "mac": "Command+Shift+H"
+      },
+      "description": "AI Website Splitter"
+    }
+  }
 }
