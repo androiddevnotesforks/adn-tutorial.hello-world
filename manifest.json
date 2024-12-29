@@ -28,7 +28,8 @@
   ],
   "host_permissions": [
     "https://www.grok.x.ai/*",
-    "https://twitter.com/*",
-    "https://chat.openai.com/*"
+    "https://x.com/*",
+    "https://chat.openai.com/*",
+    "https://www.perplexity.ai/*"
   ]
 }

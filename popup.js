@@ -60,7 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
 const URLS = {
   grok: (prompt) => `https://grok.com/chat?q=${prompt}`,
   x: (prompt) => `https://x.com/i/grok?text=${prompt}`,
-  chatgpt: (prompt) => `https://chatgpt.com/?q=${prompt}`
+  chatgpt: (prompt) => `https://chatgpt.com/?q=${prompt}`,
+  perplexity: (prompt) => `https://www.perplexity.ai/?q=${prompt}`
+
 };
 
 // Add event listeners to checkboxes to enforce 1-2 selection
