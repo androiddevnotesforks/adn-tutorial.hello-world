@@ -102,10 +102,13 @@ async function executePrompt() {
   
   try {
     if (mode === 'normal') {
-      // Open selected URLs in tabs
-      selectedSites.forEach(site => {
-        chrome.tabs.create({ url: URLS[site](encodedPrompt) });
-      });
+      // Open selected URLs in windows
+      for (const site of selectedSites) {
+        await chrome.windows.create({
+          url: URLS[site](encodedPrompt),
+          state: 'normal'
+        });
+      }
     } else {
       // Split screen mode
       const screenWidth = window.screen.availWidth;
