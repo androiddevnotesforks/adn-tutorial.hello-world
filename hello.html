@@ -31,7 +31,7 @@
         font-weight: 600;
       }
 
-      input[type="text"] {
+      input[type="text"], textarea {
         width: 100%;
         padding: 12px;
         border: 2px solid var(--border);
@@ -44,7 +44,13 @@
         color: var(--text);
       }
 
-      input[type="text"]::placeholder {
+      textarea {
+        min-height: 100px;
+        resize: vertical;
+        font-family: inherit;
+      }
+
+      input[type="text"]::placeholder, textarea::placeholder {
         color: var(--text-secondary);
       }
 
@@ -130,7 +136,7 @@
   <body>
     <h1>AI Website Splitter</h1>
     <div>
-      <input type="text" id="promptInput" placeholder="Enter your prompt...">
+      <textarea id="promptInput" placeholder="Enter your prompt..."></textarea>
       <button id="sendButton">Send to AI</button>
       
       <div class="section">
