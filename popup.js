@@ -182,10 +182,16 @@ async function executePrompt() {
 }
 
 // Listen for Enter key on input
-document.getElementById('promptInput').addEventListener('keypress', (event) => {
+document.getElementById('promptInput').addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
-    event.preventDefault();
-    executePrompt();
+    if (event.shiftKey) {
+      // Allow the default behavior for Shift+Enter (new line)
+      return;
+    } else {
+      // Prevent default and execute prompt for Enter alone
+      event.preventDefault();
+      executePrompt();
+    }
   }
 });
 
