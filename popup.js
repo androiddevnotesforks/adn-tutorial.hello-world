@@ -42,12 +42,14 @@ function restoreSettings() {
       const modeInput = document.querySelector(`input[name="mode"][value="${result.selectedMode}"]`);
       if (modeInput) {
         modeInput.checked = true;
+        toggleSplitControls(result.selectedMode === 'split');
       }
     } else {
       // Default to split mode if no saved preference
       const splitModeInput = document.querySelector('input[name="mode"][value="split"]');
       if (splitModeInput) {
         splitModeInput.checked = true;
+        toggleSplitControls(true);
       }
     }
 
@@ -296,13 +298,27 @@ document.querySelectorAll('input[name="sites"]').forEach(checkbox => {
 
 // Add event listener for mode changes
 document.querySelectorAll('input[name="mode"]').forEach(radio => {
-  radio.addEventListener('change', saveSettings);
+  radio.addEventListener('change', (e) => {
+    toggleSplitControls(e.target.value === 'split');
+    saveSettings();
+  });
 });
 
 // Add event listener for split direction changes
 document.querySelectorAll('input[name="split_direction"]').forEach(radio => {
   radio.addEventListener('change', saveSettings);
 });
+
+// Function to toggle split controls visibility
+function toggleSplitControls(show) {
+  document.querySelectorAll('.website-controls').forEach(controls => {
+    if (show) {
+      controls.classList.remove('hidden');
+    } else {
+      controls.classList.add('hidden');
+    }
+  });
+}
 
 // Function to execute the prompt
 async function executePrompt() {
