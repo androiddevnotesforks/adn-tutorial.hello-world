@@ -5,8 +5,11 @@ function saveSettings() {
   const selectedSites = Array.from(document.querySelectorAll('input[name="sites"]:checked'))
     .map(cb => cb.value);
   const selectedMode = document.querySelector('input[name="mode"]:checked').value;
-  const splitDirection = document.querySelector('input[name="split_direction"]:checked').value;
-  chrome.storage.local.set({ selectedSites, selectedMode, splitDirection });
+  const splitDirections = {};
+  document.querySelectorAll('.split-control.active').forEach(btn => {
+    splitDirections[btn.dataset.site] = btn.dataset.direction;
+  });
+  chrome.storage.local.set({ selectedSites, selectedMode, splitDirections });
 }
 
 // Function to restore selected sites and mode
@@ -17,7 +20,7 @@ function restoreSettings() {
   });
   
   // Restore saved selections and mode
-  chrome.storage.local.get(['selectedSites', 'selectedMode', 'splitDirection'], (result) => {
+  chrome.storage.local.get(['selectedSites', 'selectedMode', 'splitDirections'], (result) => {
     // Handle site selections
     if (result.selectedSites && result.selectedSites.length > 0) {
       // Use saved selections if they exist
@@ -50,10 +53,23 @@ function restoreSettings() {
       }
     }
 
-    // Handle split direction
-    if (result.splitDirection) {
-      const directionInput = document.querySelector(`input[name="split_direction"][value="${result.splitDirection}"]`);
-      if (directionInput) directionInput.checked = true;
+    // Handle split directions
+    if (result.splitDirections) {
+      Object.entries(result.splitDirections).forEach(([site, direction]) => {
+        const button = document.querySelector(`.split-control[data-site="${site}"][data-direction="${direction}"]`);
+        if (button) {
+          // Deactivate other button in the pair
+          const otherDirection = direction === 'vertical' ? 'horizontal' : 'vertical';
+          const otherButton = document.querySelector(`.split-control[data-site="${site}"][data-direction="${otherDirection}"]`);
+          if (otherButton) otherButton.classList.remove('active');
+          button.classList.add('active');
+        }
+      });
+    } else {
+      // Set default vertical split for all sites
+      document.querySelectorAll('.split-control[data-direction="vertical"]').forEach(btn => {
+        btn.classList.add('active');
+      });
     }
 
     // Save initial settings if this was the first load
@@ -115,29 +131,53 @@ function restoreCustomSites() {
 // Function to add a website to the UI
 function addWebsiteToUI(name) {
   const checkboxGroup = document.querySelector('.checkbox-group');
-  const label = document.createElement('label');
+  const websiteItem = document.createElement('div');
+  websiteItem.className = 'website-item';
   
-  // Create the label with proper styling to match existing labels
-  label.innerHTML = `
+  // Create the website item with controls
+  websiteItem.innerHTML = `
     <input type="checkbox" name="sites" value="${name}">
     <span>${name}</span>
-    ${!DEFAULT_URLS[name] ? '<button class="remove-site" title="Remove this website">Remove</button>' : ''}
+    <div class="website-controls">
+      <button class="split-control active" data-site="${name}" data-direction="vertical">Vertical</button>
+      <button class="split-control" data-site="${name}" data-direction="horizontal">Horizontal</button>
+      ${!DEFAULT_URLS[name] ? '<button class="remove-site" title="Remove this website">Remove</button>' : ''}
+    </div>
   `;
   
   // Add checkbox event listener
-  const checkbox = label.querySelector('input[type="checkbox"]');
+  const checkbox = websiteItem.querySelector('input[type="checkbox"]');
   checkbox.addEventListener('change', () => {
     saveSettings();
   });
   
+  // Add split control listeners
+  websiteItem.querySelectorAll('.split-control').forEach(button => {
+    button.addEventListener('click', () => {
+      const site = button.dataset.site;
+      const direction = button.dataset.direction;
+      
+      // Toggle active state
+      const otherDirection = direction === 'vertical' ? 'horizontal' : 'vertical';
+      const otherButton = websiteItem.querySelector(`.split-control[data-direction="${otherDirection}"]`);
+      
+      if (otherButton) {
+        otherButton.classList.remove('active');
+      }
+      button.classList.add('active');
+      
+      saveSettings();
+    });
+  });
+  
   if (!DEFAULT_URLS[name]) {
-    const removeButton = label.querySelector('.remove-site');
+    const removeButton = websiteItem.querySelector('.remove-site');
     if (removeButton) {
       removeButton.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         delete URLS[name];
-        label.remove();
+        websiteItem.remove();
         saveCustomSites();
         saveSettings();
       });
@@ -145,7 +185,7 @@ function addWebsiteToUI(name) {
   }
   
   // Insert at the end of the checkbox group
-  checkboxGroup.appendChild(label);
+  checkboxGroup.appendChild(websiteItem);
   
   // Check the checkbox by default when adding a new website
   checkbox.checked = true;
@@ -192,6 +232,26 @@ document.getElementById('addCustomSite').addEventListener('click', () => {
 // Initialize custom sites on load
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('promptInput').focus();
+  
+  // Initialize split controls for all websites (default and custom)
+  document.querySelectorAll('.split-control').forEach(button => {
+    button.addEventListener('click', () => {
+      const site = button.dataset.site;
+      const direction = button.dataset.direction;
+      
+      // Toggle active state
+      const otherDirection = direction === 'vertical' ? 'horizontal' : 'vertical';
+      const otherButton = document.querySelector(`.split-control[data-site="${site}"][data-direction="${otherDirection}"]`);
+      
+      if (otherButton) {
+        otherButton.classList.remove('active');
+      }
+      button.classList.add('active');
+      
+      saveSettings();
+    });
+  });
+
   restoreSettings();
   restoreCustomSites();
 
@@ -289,7 +349,6 @@ async function executePrompt() {
       // Split screen mode
       const screenWidth = window.screen.availWidth;
       const screenHeight = window.screen.availHeight;
-      const splitDirection = document.querySelector('input[name="split_direction"]:checked').value;
       
       if (selectedSites.length === 1) {
         // Single window mode
@@ -299,43 +358,70 @@ async function executePrompt() {
         });
       } else {
         const numWindows = selectedSites.length;
-        const isVertical = splitDirection === 'vertical';
-        const windowWidth = isVertical ? Math.floor(screenWidth / numWindows) : screenWidth;
-        const windowHeight = isVertical ? screenHeight : Math.floor(screenHeight / numWindows);
+        let verticalCount = 0;
+        let horizontalCount = 0;
+        
+        // Count splits in each direction
+        selectedSites.forEach(site => {
+          const direction = document.querySelector(`.split-control.active[data-site="${site}"]`)?.dataset.direction;
+          if (direction === 'horizontal') horizontalCount++;
+          else verticalCount++;
+        });
         
         try {
           const windows = [];
+          let currentVerticalOffset = 0;
+          let currentHorizontalOffset = 0;
+          
+          // Calculate dimensions
+          const verticalWidth = verticalCount > 0 ? Math.floor(screenWidth / verticalCount) : screenWidth;
+          const horizontalHeight = horizontalCount > 0 ? Math.floor(screenHeight / horizontalCount) : screenHeight;
           
           // Create all windows
           for (let i = 0; i < numWindows; i++) {
+            const site = selectedSites[i];
+            const direction = document.querySelector(`.split-control.active[data-site="${site}"]`)?.dataset.direction || 'vertical';
+            const isVertical = direction === 'vertical';
+            
             const window = await chrome.windows.create({
-              url: URLS[selectedSites[i]](encodedPrompt),
-              left: isVertical ? i * windowWidth : 0,
-              top: isVertical ? 0 : i * windowHeight,
-              width: windowWidth,
-              height: windowHeight,
+              url: URLS[site](encodedPrompt),
+              left: isVertical ? currentVerticalOffset : 0,
+              top: isVertical ? 0 : currentHorizontalOffset,
+              width: isVertical ? verticalWidth : screenWidth,
+              height: isVertical ? screenHeight : horizontalHeight,
               state: 'normal'
             });
-            windows.push(window);
+            
+            if (isVertical) {
+              currentVerticalOffset += verticalWidth;
+            } else {
+              currentHorizontalOffset += horizontalHeight;
+            }
+            
+            windows.push({
+              window,
+              direction,
+              offset: isVertical ? currentVerticalOffset - verticalWidth : currentHorizontalOffset - horizontalHeight
+            });
           }
 
           // Function to position windows with retry
           const positionWindows = async (attempt = 1) => {
             try {
               await Promise.all(
-                windows.map((window, index) => 
-                  chrome.windows.update(window.id, {
-                    left: isVertical ? index * windowWidth : 0,
-                    top: isVertical ? 0 : index * windowHeight,
-                    width: windowWidth,
-                    height: windowHeight,
+                windows.map(({ window, direction, offset }) => {
+                  const isVertical = direction === 'vertical';
+                  return chrome.windows.update(window.id, {
+                    left: isVertical ? offset : 0,
+                    top: isVertical ? 0 : offset,
+                    width: isVertical ? verticalWidth : screenWidth,
+                    height: isVertical ? screenHeight : horizontalHeight,
                     state: 'normal'
-                  })
-                )
+                  });
+                })
               );
             } catch (error) {
               if (attempt < 3) {
-                // Calculate delay based on number of windows and attempt number
                 const baseDelay = numWindows <= 1 ? 0 : numWindows * 500;
                 setTimeout(() => positionWindows(attempt + 1), baseDelay * attempt);
               }

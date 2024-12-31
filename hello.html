@@ -81,6 +81,49 @@
         gap: 8px;
       }
 
+      .website-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 8px;
+        transition: background 0.2s ease;
+      }
+
+      .website-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .website-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: auto;
+      }
+
+      .split-control {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 6px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        font-size: 11px;
+        color: var(--text-secondary);
+        cursor: pointer;
+      }
+
+      .split-control:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--text-secondary);
+      }
+
+      .split-control.active {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text);
+        border-color: var(--text-secondary);
+      }
+
       label {
         display: flex;
         align-items: center;
@@ -337,26 +380,46 @@
       <div class="section">
         <div class="section-title">Select websites</div>
         <div class="checkbox-group">
-          <label>
+          <div class="website-item">
             <input type="checkbox" name="sites" value="grok" checked>
             <span>Grok</span>
-          </label>
-          <label>
+            <div class="website-controls">
+              <button class="split-control active" data-site="grok" data-direction="vertical">Vertical</button>
+              <button class="split-control" data-site="grok" data-direction="horizontal">Horizontal</button>
+            </div>
+          </div>
+          <div class="website-item">
             <input type="checkbox" name="sites" value="x">
             <span>X Grok</span>
-          </label>
-          <label>
+            <div class="website-controls">
+              <button class="split-control active" data-site="x" data-direction="vertical">Vertical</button>
+              <button class="split-control" data-site="x" data-direction="horizontal">Horizontal</button>
+            </div>
+          </div>
+          <div class="website-item">
             <input type="checkbox" name="sites" value="chatgpt" checked>
             <span>ChatGPT</span>
-          </label>
-          <label>
+            <div class="website-controls">
+              <button class="split-control active" data-site="chatgpt" data-direction="vertical">Vertical</button>
+              <button class="split-control" data-site="chatgpt" data-direction="horizontal">Horizontal</button>
+            </div>
+          </div>
+          <div class="website-item">
             <input type="checkbox" name="sites" value="perplexity">
             <span>Perplexity</span>
-          </label>
-          <label>
+            <div class="website-controls">
+              <button class="split-control active" data-site="perplexity" data-direction="vertical">Vertical</button>
+              <button class="split-control" data-site="perplexity" data-direction="horizontal">Horizontal</button>
+            </div>
+          </div>
+          <div class="website-item">
             <input type="checkbox" name="sites" value="google">
             <span>Google</span>
-          </label>
+            <div class="website-controls">
+              <button class="split-control active" data-site="google" data-direction="vertical">Vertical</button>
+              <button class="split-control" data-site="google" data-direction="horizontal">Horizontal</button>
+            </div>
+          </div>
         </div>
       </div>
 
