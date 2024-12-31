@@ -89,6 +89,8 @@
         border-radius: 8px;
         transition: background 0.2s ease;
         color: var(--text);
+        min-height: 32px;
+        flex-wrap: nowrap;
       }
 
       label:hover {
@@ -135,17 +137,22 @@
       .remove-site {
         background: transparent;
         color: var(--text-secondary);
-        padding: 2px 6px;
-        margin: 0;
-        font-size: 16px;
+        padding: 3px 8px;
+        margin-left: auto;
+        font-size: 11px;
         border-radius: 4px;
+        border: 1px solid var(--border);
+        cursor: pointer;
+        min-width: auto;
+        align-self: center;
+        white-space: nowrap;
+        width: fit-content;
       }
 
       .remove-site:hover {
         background: rgba(255, 0, 0, 0.1);
         color: #ff4444;
-        transform: none;
-        box-shadow: none;
+        border-color: rgba(255, 68, 68, 0.3);
       }
     </style>
   </head>

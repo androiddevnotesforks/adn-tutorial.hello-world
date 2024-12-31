@@ -98,7 +98,7 @@ function addWebsiteToUI(name) {
   label.innerHTML = `
     <input type="checkbox" name="sites" value="${name}">
     <span>${name}</span>
-    ${!DEFAULT_URLS[name] ? '<button class="remove-site" style="margin-left: auto; padding: 2px 6px;">×</button>' : ''}
+    ${!DEFAULT_URLS[name] ? '<button class="remove-site" title="Remove this website">Remove</button>' : ''}
   `;
   
   // Add checkbox event listener
@@ -125,9 +125,8 @@ function addWebsiteToUI(name) {
     }
   }
   
-  // Insert before the Add Custom Website section
-  const addCustomSection = document.querySelector('.section:nth-child(3)');
-  checkboxGroup.insertBefore(label, null);
+  // Insert at the end of the checkbox group
+  checkboxGroup.appendChild(label);
   
   // Check the checkbox by default when adding a new website
   checkbox.checked = true;
