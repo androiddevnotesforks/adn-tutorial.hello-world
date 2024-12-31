@@ -250,11 +250,41 @@ document.addEventListener('DOMContentLoaded', () => {
   // Add event listeners for half-screen hover checkboxes
   const halfScreenHoverCheckbox = document.getElementById('halfScreenHover');
   if (halfScreenHoverCheckbox) {
-    halfScreenHoverCheckbox.addEventListener('change', saveSettings);
+    halfScreenHoverCheckbox.addEventListener('change', (e) => {
+      if (!e.target.checked) {
+        // If unchecked and horizontal is the active global direction, set all to horizontal
+        const horizontalButton = document.querySelector('.split-all-button[data-direction="horizontal"].active');
+        if (horizontalButton) {
+          document.querySelectorAll('.split-control').forEach(control => {
+            if (control.dataset.direction === 'horizontal') {
+              control.classList.add('active');
+            } else {
+              control.classList.remove('active');
+            }
+          });
+        }
+      }
+      saveSettings();
+    });
   }
   const halfScreenVerticalHoverCheckbox = document.getElementById('halfScreenVerticalHover');
   if (halfScreenVerticalHoverCheckbox) {
-    halfScreenVerticalHoverCheckbox.addEventListener('change', saveSettings);
+    halfScreenVerticalHoverCheckbox.addEventListener('change', (e) => {
+      if (!e.target.checked) {
+        // If unchecked and vertical is the active global direction, set all to vertical
+        const verticalButton = document.querySelector('.split-all-button[data-direction="vertical"].active');
+        if (verticalButton) {
+          document.querySelectorAll('.split-control').forEach(control => {
+            if (control.dataset.direction === 'vertical') {
+              control.classList.add('active');
+            } else {
+              control.classList.remove('active');
+            }
+          });
+        }
+      }
+      saveSettings();
+    });
   }
 
   // Initialize split controls for all websites (default and custom)
