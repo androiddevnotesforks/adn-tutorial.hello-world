@@ -570,14 +570,31 @@ async function executePrompt() {
                 setTimeout(async () => {
                   const horizontalWindows = windows.filter(w => w.direction === 'horizontal');
                   if (horizontalWindows.length > 0) {
-                    await Promise.all(
-                      horizontalWindows.map(({ window }) => 
-                        chrome.windows.update(window.id, {
-                          width: Math.floor(screenWidth / 2),
-                          left: 0
-                        })
-                      )
-                    );
+                    const numHorizontal = horizontalWindows.length;
+                    const leftCount = Math.ceil(numHorizontal / 2); // More windows on left if odd number
+                    const rightCount = numHorizontal - leftCount;
+                    const leftHeight = Math.floor(screenHeight / leftCount);
+                    const rightHeight = Math.floor(screenHeight / rightCount);
+
+                    // Position left side windows
+                    for (let i = 0; i < leftCount; i++) {
+                      await chrome.windows.update(horizontalWindows[i].window.id, {
+                        width: Math.floor(screenWidth / 2),
+                        height: leftHeight,
+                        left: 0,
+                        top: i * leftHeight
+                      });
+                    }
+
+                    // Position right side windows
+                    for (let i = 0; i < rightCount; i++) {
+                      await chrome.windows.update(horizontalWindows[leftCount + i].window.id, {
+                        width: Math.floor(screenWidth / 2),
+                        height: rightHeight,
+                        left: Math.floor(screenWidth / 2),
+                        top: i * rightHeight
+                      });
+                    }
                   }
                 }, 2000);
               }
