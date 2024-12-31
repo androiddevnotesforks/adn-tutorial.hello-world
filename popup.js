@@ -10,7 +10,8 @@ function saveSettings() {
     splitDirections[btn.dataset.site] = btn.dataset.direction;
   });
   const halfScreenHover = document.getElementById('halfScreenHover').checked;
-  chrome.storage.local.set({ selectedSites, selectedMode, splitDirections, halfScreenHover });
+  const halfScreenVerticalHover = document.getElementById('halfScreenVerticalHover').checked;
+  chrome.storage.local.set({ selectedSites, selectedMode, splitDirections, halfScreenHover, halfScreenVerticalHover });
 }
 
 // Function to restore selected sites and mode
@@ -21,7 +22,7 @@ function restoreSettings() {
   });
   
   // Restore saved selections and mode
-  chrome.storage.local.get(['selectedSites', 'selectedMode', 'splitDirections', 'halfScreenHover'], (result) => {
+  chrome.storage.local.get(['selectedSites', 'selectedMode', 'splitDirections', 'halfScreenHover', 'halfScreenVerticalHover'], (result) => {
     // Handle site selections
     if (result.selectedSites && result.selectedSites.length > 0) {
       result.selectedSites.forEach(site => {
@@ -40,6 +41,10 @@ function restoreSettings() {
     const halfScreenHoverCheckbox = document.getElementById('halfScreenHover');
     if (halfScreenHoverCheckbox) {
       halfScreenHoverCheckbox.checked = result.halfScreenHover || false;
+    }
+    const halfScreenVerticalHoverCheckbox = document.getElementById('halfScreenVerticalHover');
+    if (halfScreenVerticalHoverCheckbox) {
+      halfScreenVerticalHoverCheckbox.checked = result.halfScreenVerticalHover || false;
     }
 
     // Handle display mode
@@ -227,10 +232,14 @@ document.getElementById('addCustomSite').addEventListener('click', () => {
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('promptInput').focus();
   
-  // Add event listener for half-screen hover checkbox
+  // Add event listeners for half-screen hover checkboxes
   const halfScreenHoverCheckbox = document.getElementById('halfScreenHover');
   if (halfScreenHoverCheckbox) {
     halfScreenHoverCheckbox.addEventListener('change', saveSettings);
+  }
+  const halfScreenVerticalHoverCheckbox = document.getElementById('halfScreenVerticalHover');
+  if (halfScreenVerticalHoverCheckbox) {
+    halfScreenVerticalHoverCheckbox.addEventListener('change', saveSettings);
   }
 
   // Initialize split controls for all websites (default and custom)
@@ -564,14 +573,17 @@ async function executePrompt() {
                 })
               );
 
-              // Add half-screen hover effect for horizontal windows after 2 seconds if enabled
+              // Add half-screen hover effects after 2 seconds if enabled
               const halfScreenHoverEnabled = document.getElementById('halfScreenHover').checked;
-              if (halfScreenHoverEnabled) {
-                setTimeout(async () => {
+              const halfScreenVerticalHoverEnabled = document.getElementById('halfScreenVerticalHover').checked;
+
+              setTimeout(async () => {
+                // Handle horizontal windows
+                if (halfScreenHoverEnabled) {
                   const horizontalWindows = windows.filter(w => w.direction === 'horizontal');
                   if (horizontalWindows.length > 0) {
                     const numHorizontal = horizontalWindows.length;
-                    const leftCount = Math.ceil(numHorizontal / 2); // More windows on left if odd number
+                    const leftCount = Math.ceil(numHorizontal / 2);
                     const rightCount = numHorizontal - leftCount;
                     const leftHeight = Math.floor(screenHeight / leftCount);
                     const rightHeight = Math.floor(screenHeight / rightCount);
@@ -596,8 +608,40 @@ async function executePrompt() {
                       });
                     }
                   }
-                }, 2000);
-              }
+                }
+
+                // Handle vertical windows
+                if (halfScreenVerticalHoverEnabled) {
+                  const verticalWindows = windows.filter(w => w.direction === 'vertical');
+                  if (verticalWindows.length > 0) {
+                    const numVertical = verticalWindows.length;
+                    const topCount = Math.ceil(numVertical / 2); // More windows on top if odd number
+                    const bottomCount = numVertical - topCount;
+                    const topWidth = Math.floor(screenWidth / topCount);
+                    const bottomWidth = Math.floor(screenWidth / bottomCount);
+
+                    // Position top half windows
+                    for (let i = 0; i < topCount; i++) {
+                      await chrome.windows.update(verticalWindows[i].window.id, {
+                        width: topWidth,
+                        height: Math.floor(screenHeight / 2),
+                        left: i * topWidth,
+                        top: 0
+                      });
+                    }
+
+                    // Position bottom half windows
+                    for (let i = 0; i < bottomCount; i++) {
+                      await chrome.windows.update(verticalWindows[topCount + i].window.id, {
+                        width: bottomWidth,
+                        height: Math.floor(screenHeight / 2),
+                        left: i * bottomWidth,
+                        top: Math.floor(screenHeight / 2)
+                      });
+                    }
+                  }
+                }
+              }, 2000);
             } catch (error) {
               if (attempt < 3) {
                 const baseDelay = numWindows <= 1 ? 0 : numWindows * 300;
