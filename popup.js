@@ -83,7 +83,7 @@ function restoreSettings() {
       });
     }
 
-    // Handle global direction
+    // Handle global direction and hover options visibility
     if (result.globalDirection) {
       document.querySelectorAll('.split-all-button').forEach(button => {
         if (button.dataset.direction === result.globalDirection) {
@@ -92,6 +92,9 @@ function restoreSettings() {
           button.classList.remove('active');
         }
       });
+      toggleHoverOptions(result.globalDirection);
+    } else {
+      toggleHoverOptions(null);
     }
 
     // Save initial settings if this was the first load
@@ -356,6 +359,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
+      // Update hover options visibility based on the active button
+      toggleHoverOptions(button.classList.contains('active') ? direction : null);
+
       // Update all split controls if the button is active
       if (button.classList.contains('active')) {
         document.querySelectorAll('.split-control').forEach(control => {
@@ -493,6 +499,23 @@ function toggleSplitControls(show) {
     } else {
       splitControls.classList.remove('active');
     }
+  }
+}
+
+// Function to toggle hover options visibility based on global direction
+function toggleHoverOptions(direction) {
+  const halfScreenHoverOption = document.querySelector('label[for="halfScreenHover"], label.half-screen-option:has(#halfScreenHover)');
+  const halfScreenVerticalHoverOption = document.querySelector('label[for="halfScreenVerticalHover"], label.half-screen-option:has(#halfScreenVerticalHover)');
+
+  if (direction === 'horizontal') {
+    halfScreenHoverOption.style.display = 'flex';
+    halfScreenVerticalHoverOption.style.display = 'none';
+  } else if (direction === 'vertical') {
+    halfScreenHoverOption.style.display = 'none';
+    halfScreenVerticalHoverOption.style.display = 'flex';
+  } else {
+    halfScreenHoverOption.style.display = 'flex';
+    halfScreenVerticalHoverOption.style.display = 'flex';
   }
 }
 
