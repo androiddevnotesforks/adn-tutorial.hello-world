@@ -166,6 +166,29 @@
         display: block;
       }
 
+      .keyboard-shortcut {
+        font-size: 12px;
+        color: var(--text-secondary);
+        background: var(--section-bg);
+        padding: 8px 12px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .keyboard-shortcut kbd {
+        background: var(--primary);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 11px;
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+
       label {
         display: flex;
         align-items: center;
@@ -461,6 +484,25 @@
         background: rgba(255, 255, 255, 0.05);
         border-color: var(--text-secondary);
       }
+
+      .shortcut-footer {
+        font-size: 12px;
+        color: var(--text-secondary);
+        text-align: center;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+      }
+
+      .shortcut-footer kbd {
+        background: var(--primary);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 11px;
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
     </style>
   </head>
   <body>
@@ -598,6 +640,9 @@
           <button class="split-all-button" data-direction="horizontal">All Horizontal</button>
         </div>
       </div>
+    </div>
+    <div class="shortcut-footer">
+      Keyboard shortcut: <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>H</kbd>
     </div>
     <script src="popup.js"></script>
   </body>

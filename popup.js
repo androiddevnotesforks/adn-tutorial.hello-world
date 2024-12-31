@@ -247,6 +247,15 @@ document.getElementById('addCustomSite').addEventListener('click', () => {
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('promptInput').focus();
   
+  // Update keyboard shortcut based on platform
+  const isMac = navigator.platform.toLowerCase().includes('mac');
+  const shortcutElement = document.querySelector('.shortcut-footer');
+  if (shortcutElement) {
+    shortcutElement.innerHTML = isMac ? 
+      'Keyboard shortcut: <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>H</kbd>' :
+      'Keyboard shortcut: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>H</kbd>';
+  }
+
   // Add event listeners for half-screen hover checkboxes
   const smartLayoutHoverCheckbox = document.getElementById('smartLayoutHover');
   if (smartLayoutHoverCheckbox) {
