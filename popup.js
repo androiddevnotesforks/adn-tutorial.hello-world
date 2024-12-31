@@ -177,8 +177,7 @@ function addWebsiteToUI(name) {
   // Insert at the end of the checkbox group
   checkboxGroup.appendChild(websiteItem);
   
-  // Check the checkbox by default when adding a new website
-  checkbox.checked = true;
+  // Save settings without automatically checking the checkbox
   saveSettings();
 }
 
@@ -242,8 +241,70 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // First restore custom sites without saving settings
+  chrome.storage.local.get(['customSites'], (result) => {
+    if (result.customSites) {
+      Object.entries(result.customSites).forEach(([key, template]) => {
+        // Create the function from the template
+        URLS[key] = (prompt) => template.replace('{prompt}', prompt);
+        // Add to UI without saving settings
+        const checkboxGroup = document.querySelector('.checkbox-group');
+        const websiteItem = document.createElement('div');
+        websiteItem.className = 'website-item';
+        
+        websiteItem.innerHTML = `
+          <input type="checkbox" name="sites" value="${key}">
+          <span>${key}</span>
+          <div class="website-controls">
+            <button class="split-control active" data-site="${key}" data-direction="vertical">Vertical</button>
+            <button class="split-control" data-site="${key}" data-direction="horizontal">Horizontal</button>
+            <button class="remove-site" title="Remove this website">Remove</button>
+          </div>
+        `;
+        
+        // Add checkbox event listener
+        const checkbox = websiteItem.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener('change', () => {
+          saveSettings();
+        });
+        
+        // Add split control listeners
+        websiteItem.querySelectorAll('.split-control').forEach(button => {
+          button.addEventListener('click', () => {
+            const site = button.dataset.site;
+            const direction = button.dataset.direction;
+            
+            const otherDirection = direction === 'vertical' ? 'horizontal' : 'vertical';
+            const otherButton = websiteItem.querySelector(`.split-control[data-direction="${otherDirection}"]`);
+            
+            if (otherButton) {
+              otherButton.classList.remove('active');
+            }
+            button.classList.add('active');
+            
+            saveSettings();
+          });
+        });
+        
+        const removeButton = websiteItem.querySelector('.remove-site');
+        if (removeButton) {
+          removeButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            delete URLS[key];
+            websiteItem.remove();
+            saveCustomSites();
+            saveSettings();
+          });
+        }
+        
+        checkboxGroup.appendChild(websiteItem);
+      });
+    }
+  });
+
+  // Then restore settings
   restoreSettings();
-  restoreCustomSites();
 
   // Add event listeners for split-all buttons
   document.querySelectorAll('.split-all-button').forEach(button => {
