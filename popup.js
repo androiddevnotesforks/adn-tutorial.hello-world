@@ -514,8 +514,9 @@ function toggleHoverOptions(direction) {
     halfScreenHoverOption.style.display = 'none';
     halfScreenVerticalHoverOption.style.display = 'flex';
   } else {
-    halfScreenHoverOption.style.display = 'flex';
-    halfScreenVerticalHoverOption.style.display = 'flex';
+    // Hide both options when no direction is selected
+    halfScreenHoverOption.style.display = 'none';
+    halfScreenVerticalHoverOption.style.display = 'none';
   }
 }
 
