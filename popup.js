@@ -42,14 +42,12 @@ function restoreSettings() {
       const modeInput = document.querySelector(`input[name="mode"][value="${result.selectedMode}"]`);
       if (modeInput) {
         modeInput.checked = true;
-        updateSplitOptionsVisibility(result.selectedMode === 'split');
       }
     } else {
       // Default to split mode if no saved preference
       const splitModeInput = document.querySelector('input[name="mode"][value="split"]');
       if (splitModeInput) {
         splitModeInput.checked = true;
-        updateSplitOptionsVisibility(true);
       }
     }
 
@@ -77,16 +75,6 @@ function restoreSettings() {
       saveSettings();
     }
   });
-}
-
-// Function to update split options visibility
-function updateSplitOptionsVisibility(show) {
-  const splitOptions = document.querySelector('.split-options');
-  if (show) {
-    splitOptions.classList.add('active');
-  } else {
-    splitOptions.classList.remove('active');
-  }
 }
 
 // URL mapping
@@ -308,10 +296,7 @@ document.querySelectorAll('input[name="sites"]').forEach(checkbox => {
 
 // Add event listener for mode changes
 document.querySelectorAll('input[name="mode"]').forEach(radio => {
-  radio.addEventListener('change', (e) => {
-    updateSplitOptionsVisibility(e.target.value === 'split');
-    saveSettings();
-  });
+  radio.addEventListener('change', saveSettings);
 });
 
 // Add event listener for split direction changes
