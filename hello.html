@@ -503,6 +503,21 @@
         color: var(--text);
         border: 1px solid var(--border);
       }
+
+      .error-message {
+        display: none;
+        color: #ff4444;
+        font-size: 12px;
+        padding: 8px 12px;
+        background: rgba(255, 68, 68, 0.1);
+        border: 1px solid rgba(255, 68, 68, 0.2);
+        border-radius: var(--radius);
+        margin-top: 8px;
+      }
+
+      .error-message.visible {
+        display: block;
+      }
     </style>
   </head>
   <body>
@@ -639,6 +654,7 @@
             </div>
           </div>
           <button id="addCustomSite" style="margin-top: 0;">Add Website</button>
+          <div id="customSiteError" class="error-message"></div>
         </div>
       </div>
 

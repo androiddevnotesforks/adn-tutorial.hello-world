@@ -211,22 +211,64 @@ function addWebsiteToUI(name) {
 document.getElementById('addCustomSite').addEventListener('click', () => {
   const nameInput = document.getElementById('customSiteName');
   const urlInput = document.getElementById('customSiteUrl');
+  const errorElement = document.getElementById('customSiteError');
   
   const name = nameInput.value.trim();
   const urlTemplate = urlInput.value.trim();
+
+  // Helper function to show error
+  const showError = (message, focusElement) => {
+    errorElement.textContent = message;
+    errorElement.classList.add('visible');
+    if (focusElement) focusElement.focus();
+  };
+
+  // Clear previous error
+  errorElement.classList.remove('visible');
   
-  if (!name || !urlTemplate) {
-    alert('Please enter both name and URL template');
+  // Validate name
+  if (!name) {
+    showError('Please enter a website name', nameInput);
+    return;
+  }
+
+  // Validate URL template
+  if (!urlTemplate) {
+    showError('Please enter a URL template', urlInput);
     return;
   }
   
   if (URLS[name]) {
-    alert('A website with this name already exists');
+    showError('A website with this name already exists', nameInput);
     return;
   }
-  
-  if (!urlTemplate.includes('{prompt}')) {
-    alert('URL template must include {prompt} placeholder');
+
+  // Validate URL format
+  try {
+    // Test if it's a valid URL by replacing {prompt} with a test value
+    const testUrl = urlTemplate.replace('{prompt}', 'test');
+    new URL(testUrl);
+
+    if (!urlTemplate.includes('{prompt}')) {
+      showError('URL template must include {prompt} placeholder.\n\nExample: https://example.com/search?q={prompt}', urlInput);
+      return;
+    }
+
+    // Check if the {prompt} is in a query parameter or path
+    const isValidFormat = urlTemplate.includes('?') && 
+      (urlTemplate.includes('q={prompt}') || 
+       urlTemplate.includes('query={prompt}') || 
+       urlTemplate.includes('search={prompt}') || 
+       urlTemplate.includes('text={prompt}') ||
+       urlTemplate.includes('p={prompt}')) ||
+      urlTemplate.includes('/{prompt}');
+
+    if (!isValidFormat) {
+      showError('The {prompt} should be in a query parameter (like ?q={prompt}) or in the path.\n\nExamples:\n- https://example.com/search?q={prompt}\n- https://example.com/query/{prompt}', urlInput);
+      return;
+    }
+  } catch (error) {
+    showError('Please enter a valid URL starting with http:// or https://', urlInput);
     return;
   }
   
@@ -239,9 +281,19 @@ document.getElementById('addCustomSite').addEventListener('click', () => {
   // Save to storage
   saveCustomSites();
   
-  // Clear inputs
+  // Clear inputs and error
   nameInput.value = '';
   urlInput.value = '';
+  errorElement.classList.remove('visible');
+});
+
+// Clear error message when user starts typing
+document.getElementById('customSiteName').addEventListener('input', () => {
+  document.getElementById('customSiteError').classList.remove('visible');
+});
+
+document.getElementById('customSiteUrl').addEventListener('input', () => {
+  document.getElementById('customSiteError').classList.remove('visible');
 });
 
 // Initialize custom sites on load
