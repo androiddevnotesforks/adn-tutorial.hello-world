@@ -62,16 +62,14 @@ const URLS = {
   x: (prompt) => `https://x.com/i/grok?text=${prompt}`,
   chatgpt: (prompt) => `https://chatgpt.com/?q=${prompt}`,
   perplexity: (prompt) => `https://www.perplexity.ai/?q=${prompt}`,
-  google: (prompt) => `https://www.google.com/search?q=${prompt}`
-
-
+  google: (prompt) => `https://www.google.com/search?q=${prompt}`,
 };
 
-// Add event listeners to checkboxes to enforce 1-2 selection
+// Add event listeners to checkboxes to enforce 1-3 selection
 document.querySelectorAll('input[name="sites"]').forEach(checkbox => {
   checkbox.addEventListener('change', () => {
     const checked = document.querySelectorAll('input[name="sites"]:checked');
-    if (checked.length > 2) {
+    if (checked.length > 3) {
       checkbox.checked = false;
     }
     saveSettings();
@@ -121,49 +119,40 @@ async function executePrompt() {
           state: 'maximized'
         });
       } else {
-        // Two windows side by side
-        const windowWidth = Math.floor(screenWidth / 2);
+        // Two or three windows side by side
+        const numWindows = selectedSites.length;
+        const windowWidth = Math.floor(screenWidth / numWindows);
         
         try {
-          // Create first window
-          const firstWindow = await chrome.windows.create({
-            url: URLS[selectedSites[0]](encodedPrompt),
-            left: 0,
-            top: 0,
-            width: windowWidth,
-            height: screenHeight,
-            state: 'normal'
-          });
-
-          // Create second window
-          const secondWindow = await chrome.windows.create({
-            url: URLS[selectedSites[1]](encodedPrompt),
-            left: windowWidth,
-            top: 0,
-            width: windowWidth,
-            height: screenHeight,
-            state: 'normal'
-          });
+          const windows = [];
+          
+          // Create all windows
+          for (let i = 0; i < numWindows; i++) {
+            const window = await chrome.windows.create({
+              url: URLS[selectedSites[i]](encodedPrompt),
+              left: i * windowWidth,
+              top: 0,
+              width: windowWidth,
+              height: screenHeight,
+              state: 'normal'
+            });
+            windows.push(window);
+          }
 
           // Function to position windows with retry
           const positionWindows = async (attempt = 1) => {
             try {
-              await Promise.all([
-                chrome.windows.update(firstWindow.id, {
-                  left: 0,
-                  top: 0,
-                  width: windowWidth,
-                  height: screenHeight,
-                  state: 'normal'
-                }),
-                chrome.windows.update(secondWindow.id, {
-                  left: windowWidth,
-                  top: 0,
-                  width: windowWidth,
-                  height: screenHeight,
-                  state: 'normal'
-                })
-              ]);
+              await Promise.all(
+                windows.map((window, index) => 
+                  chrome.windows.update(window.id, {
+                    left: index * windowWidth,
+                    top: 0,
+                    width: windowWidth,
+                    height: screenHeight,
+                    state: 'normal'
+                  })
+                )
+              );
             } catch (error) {
               if (attempt < 3) {
                 // Retry up to 3 times with increasing delay
