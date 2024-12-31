@@ -148,10 +148,10 @@
         display: none;
         font-size: 11px;
         color: #ff9800;
-        margin-top: 4px;
-        padding: 4px 8px;
+        margin: 8px 0;
+        padding: 8px 12px;
         background: rgba(255, 152, 0, 0.1);
-        border-radius: 4px;
+        border-radius: var(--radius);
         border: 1px solid rgba(255, 152, 0, 0.2);
       }
 
@@ -438,6 +438,8 @@
       <textarea id="promptInput" placeholder="Enter your prompt..."></textarea>
       <button id="sendButton">Send to AI</button>
       
+      <div class="split-warning"></div>
+      
       <div class="section">
         <div class="section-title">Select websites</div>
         <div class="checkbox-group">
@@ -555,7 +557,6 @@
         <div class="split-controls">
           <button class="split-all-button" data-direction="vertical">Make All Vertical</button>
           <button class="split-all-button" data-direction="horizontal">Make All Horizontal</button>
-          <div class="split-warning"></div>
         </div>
       </div>
     </div>
