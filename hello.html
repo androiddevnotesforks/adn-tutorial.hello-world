@@ -16,7 +16,8 @@
       }
 
       body {
-        min-width: 320px;
+        min-width: 350px;
+        max-width: 400px;
         padding: 16px;
         margin: 0;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -154,6 +155,154 @@
         color: #ff4444;
         border-color: rgba(255, 68, 68, 0.3);
       }
+
+      .info-wrapper {
+        position: relative;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .info-button {
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        padding: 0;
+        margin: 0;
+        font-size: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .info-button:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--text-secondary);
+      }
+
+      .info-tooltip {
+        display: none;
+        position: absolute;
+        left: -16px;
+        right: -16px;
+        top: calc(100% + 4px);
+        background: var(--section-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 12px;
+        font-size: 12px;
+        color: var(--text);
+        z-index: 100;
+        box-shadow: var(--shadow);
+        user-select: text;
+        cursor: auto;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .info-tooltip.visible {
+        display: block;
+      }
+
+      .info-tooltip-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        gap: 8px;
+        position: sticky;
+        top: 0;
+        background: var(--section-bg);
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .info-tooltip-title {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .info-tooltip-close {
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        padding: 4px;
+        margin: -4px;
+        cursor: pointer;
+        font-size: 16px;
+        width: auto;
+      }
+
+      .info-tooltip-close:hover {
+        color: var(--text);
+        transform: none;
+        box-shadow: none;
+      }
+
+      .example-list {
+        margin: 8px 0 0 0;
+        padding-left: 0;
+        list-style: none;
+        color: var(--text-secondary);
+        user-select: text;
+      }
+
+      .example-list li {
+        margin-bottom: 8px;
+      }
+
+      .example-list li:last-child {
+        margin-bottom: 0;
+      }
+
+      .example-url-wrapper {
+        display: flex;
+        gap: 4px;
+        margin-top: 2px;
+      }
+
+      .example-url {
+        color: var(--text);
+        word-break: break-all;
+        font-family: monospace;
+        background: var(--input-bg);
+        padding: 3px 6px;
+        border-radius: 4px;
+        flex-grow: 1;
+        font-size: 11px;
+        line-height: 16px;
+      }
+
+      .copy-button {
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 2px 8px;
+        margin: 0;
+        font-size: 11px;
+        cursor: pointer;
+        white-space: nowrap;
+        width: auto;
+        line-height: 16px;
+      }
+
+      .copy-button:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        border-color: var(--text-secondary);
+      }
+
+      .copy-button.copied {
+        background: rgba(0, 255, 0, 0.1);
+        color: #4CAF50;
+        border-color: rgba(76, 175, 80, 0.3);
+      }
     </style>
   </head>
   <body>
@@ -192,7 +341,54 @@
         <div class="section-title">Add Custom Website</div>
         <div style="display: flex; flex-direction: column; gap: 12px;">
           <input type="text" id="customSiteName" placeholder="Website name (e.g., Bing)" />
-          <input type="text" id="customSiteUrl" placeholder="URL with {prompt} as search term (e.g., https://www.bing.com/search?q={prompt})" />
+          <div class="info-wrapper">
+            <input type="text" id="customSiteUrl" placeholder="URL with {prompt} as search term (e.g., https://www.bing.com/search?q={prompt})" />
+            <button class="info-button" title="Show examples">?</button>
+            <div class="info-tooltip">
+              <div class="info-tooltip-header">
+                <div class="info-tooltip-title">How to Add Custom Websites</div>
+                <button class="info-tooltip-close" title="Close">×</button>
+              </div>
+              <div>Replace your search term with <span class="example-url">{prompt}</span> in the URL. Common examples:</div>
+              <ul class="example-list">
+                <li>
+                  <strong>Bing Search</strong>
+                  <div class="example-url-wrapper">
+                    <span class="example-url">https://www.bing.com/search?q={prompt}</span>
+                    <button class="copy-button" data-url="https://www.bing.com/search?q={prompt}">Copy</button>
+                  </div>
+                </li>
+                <li>
+                  <strong>Brave Search</strong>
+                  <div class="example-url-wrapper">
+                    <span class="example-url">https://search.brave.com/search?q={prompt}</span>
+                    <button class="copy-button" data-url="https://search.brave.com/search?q={prompt}">Copy</button>
+                  </div>
+                </li>
+                <li>
+                  <strong>DuckDuckGo</strong>
+                  <div class="example-url-wrapper">
+                    <span class="example-url">https://duckduckgo.com/?q={prompt}</span>
+                    <button class="copy-button" data-url="https://duckduckgo.com/?q={prompt}">Copy</button>
+                  </div>
+                </li>
+                <li>
+                  <strong>Yahoo Search</strong>
+                  <div class="example-url-wrapper">
+                    <span class="example-url">https://search.yahoo.com/search?p={prompt}</span>
+                    <button class="copy-button" data-url="https://search.yahoo.com/search?p={prompt}">Copy</button>
+                  </div>
+                </li>
+                <li>
+                  <strong>Claude AI</strong>
+                  <div class="example-url-wrapper">
+                    <span class="example-url">https://claude.ai/chat?q={prompt}</span>
+                    <button class="copy-button" data-url="https://claude.ai/chat?q={prompt}">Copy</button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
           <button id="addCustomSite" style="margin-top: 0;">Add Website</button>
         </div>
       </div>

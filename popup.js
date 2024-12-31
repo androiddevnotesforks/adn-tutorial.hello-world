@@ -171,6 +171,51 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('promptInput').focus();
   restoreSettings();
   restoreCustomSites();
+
+  // Info tooltip functionality
+  const infoButton = document.querySelector('.info-button');
+  const infoTooltip = document.querySelector('.info-tooltip');
+  const closeButton = document.querySelector('.info-tooltip-close');
+
+  infoButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    infoTooltip.classList.toggle('visible');
+  });
+
+  closeButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    infoTooltip.classList.remove('visible');
+  });
+
+  // Close tooltip when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!infoTooltip.contains(e.target) && !infoButton.contains(e.target)) {
+      infoTooltip.classList.remove('visible');
+    }
+  });
+
+  // Prevent tooltip from closing when clicking inside it
+  infoTooltip.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  // Copy button functionality
+  document.querySelectorAll('.copy-button').forEach(button => {
+    button.addEventListener('click', async () => {
+      const url = button.dataset.url;
+      try {
+        await navigator.clipboard.writeText(url);
+        button.textContent = 'Copied!';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.textContent = 'Copy';
+          button.classList.remove('copied');
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    });
+  });
 });
 
 // Add event listeners to checkboxes
@@ -257,14 +302,16 @@ async function executePrompt() {
               );
             } catch (error) {
               if (attempt < 3) {
-                // Retry up to 3 times with increasing delay
-                setTimeout(() => positionWindows(attempt + 1), 1500 * attempt);
+                // Calculate delay based on number of windows and attempt number
+                const baseDelay = numWindows <= 1 ? 0 : numWindows * 500;
+                setTimeout(() => positionWindows(attempt + 1), baseDelay * attempt);
               }
             }
           };
 
-          // Initial positioning with delay to let windows settle
-          setTimeout(() => positionWindows(), 1500);
+          // Initial positioning with delay based on number of windows
+          const initialDelay = numWindows <= 1 ? 0 : numWindows * 500;
+          setTimeout(() => positionWindows(), initialDelay);
         } catch (error) {
           console.error('Error in split screen:', error);
         }
