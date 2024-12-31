@@ -574,13 +574,20 @@ async function executePrompt() {
   
   try {
     if (mode === 'normal') {
-      // Open selected URLs in windows
-      for (const site of selectedSites) {
-        await chrome.windows.create({
+      // Get the current window
+      const currentWindow = await chrome.windows.getCurrent();
+      
+      // Create promises for all tabs
+      const tabPromises = selectedSites.map(site => 
+        chrome.tabs.create({
           url: URLS[site](encodedPrompt),
-          state: 'normal'
-        });
-      }
+          windowId: currentWindow.id,
+          active: false // Keep the current tab active
+        })
+      );
+      
+      // Wait for all tabs to be created
+      await Promise.all(tabPromises);
     } else {
       // Split screen mode
       const screenWidth = window.screen.availWidth;
