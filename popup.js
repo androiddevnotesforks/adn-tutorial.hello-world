@@ -245,6 +245,22 @@ document.addEventListener('DOMContentLoaded', () => {
   restoreSettings();
   restoreCustomSites();
 
+  // Add event listeners for split-all buttons
+  document.querySelectorAll('.split-all-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const direction = button.dataset.direction;
+      // Update all split controls
+      document.querySelectorAll('.split-control').forEach(control => {
+        if (control.dataset.direction === direction) {
+          control.classList.add('active');
+        } else {
+          control.classList.remove('active');
+        }
+      });
+      saveSettings();
+    });
+  });
+
   // Info tooltip functionality
   const infoButton = document.querySelector('.info-button');
   const infoTooltip = document.querySelector('.info-tooltip');
