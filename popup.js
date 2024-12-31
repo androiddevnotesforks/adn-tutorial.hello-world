@@ -50,20 +50,133 @@ function restoreSettings() {
   });
 }
 
-// Focus on the prompt input field when popup opens
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('promptInput').focus();
-  restoreSettings();
-});
-
 // URL mapping
-const URLS = {
+const DEFAULT_URLS = {
   grok: (prompt) => `https://grok.com/chat?q=${prompt}`,
   x: (prompt) => `https://x.com/i/grok?text=${prompt}`,
   chatgpt: (prompt) => `https://chatgpt.com/?q=${prompt}`,
   perplexity: (prompt) => `https://www.perplexity.ai/?q=${prompt}`,
   google: (prompt) => `https://www.google.com/search?q=${prompt}`
 };
+
+let URLS = { ...DEFAULT_URLS };
+
+// Function to save custom sites
+function saveCustomSites() {
+  const customSites = Object.keys(URLS).reduce((acc, key) => {
+    if (!DEFAULT_URLS[key]) {
+      // Store the URL template directly
+      const fn = URLS[key];
+      const dummyPrompt = '{prompt}';
+      const template = fn(dummyPrompt);
+      acc[key] = template;
+    }
+    return acc;
+  }, {});
+  chrome.storage.local.set({ customSites });
+}
+
+// Function to restore custom sites
+function restoreCustomSites() {
+  chrome.storage.local.get(['customSites'], (result) => {
+    if (result.customSites) {
+      Object.entries(result.customSites).forEach(([key, template]) => {
+        // Create the function from the template
+        URLS[key] = (prompt) => template.replace('{prompt}', prompt);
+        addWebsiteToUI(key);
+      });
+    }
+  });
+}
+
+// Function to add a website to the UI
+function addWebsiteToUI(name) {
+  const checkboxGroup = document.querySelector('.checkbox-group');
+  const label = document.createElement('label');
+  
+  // Create the label with proper styling to match existing labels
+  label.innerHTML = `
+    <input type="checkbox" name="sites" value="${name}">
+    <span>${name}</span>
+    ${!DEFAULT_URLS[name] ? '<button class="remove-site" style="margin-left: auto; padding: 2px 6px;">×</button>' : ''}
+  `;
+  
+  // Add checkbox event listener
+  const checkbox = label.querySelector('input[type="checkbox"]');
+  checkbox.addEventListener('change', () => {
+    const checked = document.querySelectorAll('input[name="sites"]:checked');
+    if (checked.length > 4) {
+      checkbox.checked = false;
+    }
+    saveSettings();
+  });
+  
+  if (!DEFAULT_URLS[name]) {
+    const removeButton = label.querySelector('.remove-site');
+    if (removeButton) {
+      removeButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        delete URLS[name];
+        label.remove();
+        saveCustomSites();
+        saveSettings();
+      });
+    }
+  }
+  
+  // Insert before the Add Custom Website section
+  const addCustomSection = document.querySelector('.section:nth-child(3)');
+  checkboxGroup.insertBefore(label, null);
+  
+  // Check the checkbox by default when adding a new website
+  checkbox.checked = true;
+  saveSettings();
+}
+
+// Add custom website handler
+document.getElementById('addCustomSite').addEventListener('click', () => {
+  const nameInput = document.getElementById('customSiteName');
+  const urlInput = document.getElementById('customSiteUrl');
+  
+  const name = nameInput.value.trim();
+  const urlTemplate = urlInput.value.trim();
+  
+  if (!name || !urlTemplate) {
+    alert('Please enter both name and URL template');
+    return;
+  }
+  
+  if (URLS[name]) {
+    alert('A website with this name already exists');
+    return;
+  }
+  
+  if (!urlTemplate.includes('{prompt}')) {
+    alert('URL template must include {prompt} placeholder');
+    return;
+  }
+  
+  // Add to URLS object
+  URLS[name] = (prompt) => urlTemplate.replace('{prompt}', prompt);
+  
+  // Add to UI
+  addWebsiteToUI(name);
+  
+  // Save to storage
+  saveCustomSites();
+  
+  // Clear inputs
+  nameInput.value = '';
+  urlInput.value = '';
+});
+
+// Initialize custom sites on load
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('promptInput').focus();
+  restoreSettings();
+  restoreCustomSites();
+});
 
 // Add event listeners to checkboxes to enforce 1-4 selection
 document.querySelectorAll('input[name="sites"]').forEach(checkbox => {

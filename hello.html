@@ -131,6 +131,22 @@
       button:active {
         transform: translateY(0);
       }
+
+      .remove-site {
+        background: transparent;
+        color: var(--text-secondary);
+        padding: 2px 6px;
+        margin: 0;
+        font-size: 16px;
+        border-radius: 4px;
+      }
+
+      .remove-site:hover {
+        background: rgba(255, 0, 0, 0.1);
+        color: #ff4444;
+        transform: none;
+        box-shadow: none;
+      }
     </style>
   </head>
   <body>
@@ -162,6 +178,15 @@
             <input type="checkbox" name="sites" value="google">
             <span>Google</span>
           </label>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Add Custom Website</div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <input type="text" id="customSiteName" placeholder="Website name (e.g., Bing)" />
+          <input type="text" id="customSiteUrl" placeholder="URL with {prompt} as search term (e.g., https://www.bing.com/search?q={prompt})" />
+          <button id="addCustomSite" style="margin-top: 0;">Add Website</button>
         </div>
       </div>
 
