@@ -374,7 +374,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Add event listeners for split-all buttons
   document.querySelectorAll('.split-all-button').forEach(button => {
     button.addEventListener('click', () => {
-      // Only proceed if in split mode
       const currentMode = document.querySelector('input[name="mode"]:checked').value;
       if (currentMode !== 'split') return;
 
@@ -388,6 +387,12 @@ document.addEventListener('DOMContentLoaded', () => {
           btn.classList.remove('active');
         }
       });
+
+      // Clear smart mode checkboxes when switching layouts
+      const halfScreenHoverCheckbox = document.getElementById('halfScreenHover');
+      const halfScreenVerticalHoverCheckbox = document.getElementById('halfScreenVerticalHover');
+      halfScreenHoverCheckbox.checked = false;
+      halfScreenVerticalHoverCheckbox.checked = false;
 
       // Update hover options visibility based on the active button
       toggleHoverOptions(button.classList.contains('active') ? direction : null);
@@ -728,14 +733,14 @@ async function executePrompt() {
               }
             } catch (error) {
               if (attempt < 3) {
-                const baseDelay = numWindows <= 1 ? 0 : numWindows * 300;
+                const baseDelay = numWindows <= 1 ? 0 : numWindows * 500;
                 setTimeout(() => positionWindows(attempt + 1), baseDelay * attempt);
               }
             }
           };
 
           // Initial positioning with delay based on number of windows
-          const initialDelay = numWindows <= 1 ? 0 : numWindows * 300;
+          const initialDelay = numWindows <= 1 ? 0 : numWindows * 500;
           setTimeout(() => positionWindows(), initialDelay);
         } catch (error) {
           console.error('Error in split screen:', error);
