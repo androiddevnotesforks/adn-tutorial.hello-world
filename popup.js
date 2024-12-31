@@ -248,6 +248,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Add event listeners for split-all buttons
   document.querySelectorAll('.split-all-button').forEach(button => {
     button.addEventListener('click', () => {
+      // Only proceed if in split mode
+      const currentMode = document.querySelector('input[name="mode"]:checked').value;
+      if (currentMode !== 'split') return;
+
       const direction = button.dataset.direction;
       // Update all split controls
       document.querySelectorAll('.split-control').forEach(control => {
@@ -334,6 +338,16 @@ function toggleSplitControls(show) {
       controls.classList.add('hidden');
     }
   });
+  
+  // Also toggle the split-all buttons visibility
+  const splitControls = document.querySelector('.split-controls');
+  if (splitControls) {
+    if (show) {
+      splitControls.classList.add('active');
+    } else {
+      splitControls.classList.remove('active');
+    }
+  }
 }
 
 // Function to execute the prompt

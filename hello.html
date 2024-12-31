@@ -389,6 +389,32 @@
         color: #4CAF50;
         border-color: rgba(76, 175, 80, 0.3);
       }
+
+      .split-controls {
+        display: none;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .split-controls.active {
+        display: flex;
+      }
+
+      .split-all-button {
+        flex: 1;
+        padding: 6px 12px;
+        font-size: 12px;
+        margin-top: 0;
+        background: var(--section-bg);
+        border: 1px solid var(--border);
+      }
+
+      .split-all-button:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--text-secondary);
+        transform: none;
+        box-shadow: none;
+      }
     </style>
   </head>
   <body>
@@ -511,7 +537,7 @@
             <span>Split Screen</span>
           </label>
         </div>
-        <div class="split-controls" style="display: flex; gap: 8px; margin-top: 8px;">
+        <div class="split-controls">
           <button class="split-all-button" data-direction="vertical">Make All Vertical</button>
           <button class="split-all-button" data-direction="horizontal">Make All Horizontal</button>
         </div>
