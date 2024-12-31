@@ -135,6 +135,7 @@
         margin-top: 0;
         background: var(--section-bg);
         border: 1px solid var(--border);
+        min-width: 120px;
       }
 
       .split-all-button:hover {
@@ -142,6 +143,12 @@
         border-color: var(--text-secondary);
         transform: none;
         box-shadow: none;
+      }
+
+      .split-all-button.active {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text);
+        border-color: var(--text-secondary);
       }
 
       .split-warning {

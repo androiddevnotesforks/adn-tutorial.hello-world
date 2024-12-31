@@ -11,7 +11,8 @@ function saveSettings() {
   });
   const halfScreenHover = document.getElementById('halfScreenHover').checked;
   const halfScreenVerticalHover = document.getElementById('halfScreenVerticalHover').checked;
-  chrome.storage.local.set({ selectedSites, selectedMode, splitDirections, halfScreenHover, halfScreenVerticalHover });
+  const globalDirection = document.querySelector('.split-all-button.active')?.dataset.direction || null;
+  chrome.storage.local.set({ selectedSites, selectedMode, splitDirections, halfScreenHover, halfScreenVerticalHover, globalDirection });
 }
 
 // Function to restore selected sites and mode
@@ -22,7 +23,7 @@ function restoreSettings() {
   });
   
   // Restore saved selections and mode
-  chrome.storage.local.get(['selectedSites', 'selectedMode', 'splitDirections', 'halfScreenHover', 'halfScreenVerticalHover'], (result) => {
+  chrome.storage.local.get(['selectedSites', 'selectedMode', 'splitDirections', 'halfScreenHover', 'halfScreenVerticalHover', 'globalDirection'], (result) => {
     // Handle site selections
     if (result.selectedSites && result.selectedSites.length > 0) {
       result.selectedSites.forEach(site => {
@@ -79,6 +80,17 @@ function restoreSettings() {
       // Set default vertical split for all sites
       document.querySelectorAll('.split-control[data-direction="vertical"]').forEach(btn => {
         btn.classList.add('active');
+      });
+    }
+
+    // Handle global direction
+    if (result.globalDirection) {
+      document.querySelectorAll('.split-all-button').forEach(button => {
+        if (button.dataset.direction === result.globalDirection) {
+          button.classList.add('active');
+        } else {
+          button.classList.remove('active');
+        }
       });
     }
 
@@ -334,14 +346,27 @@ document.addEventListener('DOMContentLoaded', () => {
       if (currentMode !== 'split') return;
 
       const direction = button.dataset.direction;
-      // Update all split controls
-      document.querySelectorAll('.split-control').forEach(control => {
-        if (control.dataset.direction === direction) {
-          control.classList.add('active');
+      
+      // Toggle active state for split-all buttons
+      document.querySelectorAll('.split-all-button').forEach(btn => {
+        if (btn === button) {
+          btn.classList.toggle('active');
         } else {
-          control.classList.remove('active');
+          btn.classList.remove('active');
         }
       });
+
+      // Update all split controls if the button is active
+      if (button.classList.contains('active')) {
+        document.querySelectorAll('.split-control').forEach(control => {
+          if (control.dataset.direction === direction) {
+            control.classList.add('active');
+          } else {
+            control.classList.remove('active');
+          }
+        });
+      }
+      
       saveSettings();
       updateSplitWarning();
     });
