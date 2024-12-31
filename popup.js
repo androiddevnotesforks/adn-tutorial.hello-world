@@ -156,13 +156,13 @@ async function executePrompt() {
             } catch (error) {
               if (attempt < 3) {
                 // Retry up to 3 times with increasing delay
-                setTimeout(() => positionWindows(attempt + 1), 750 * attempt);
+                setTimeout(() => positionWindows(attempt + 1), 1500 * attempt);
               }
             }
           };
 
           // Initial positioning with delay to let windows settle
-          setTimeout(() => positionWindows(), 750);
+          setTimeout(() => positionWindows(), 1500);
         } catch (error) {
           console.error('Error in split screen:', error);
         }
