@@ -262,8 +262,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
       saveSettings();
+      updateSplitWarning();
     });
   });
+
+  // Function to update split warning based on selected sites and direction
+  function updateSplitWarning() {
+    const selectedSites = document.querySelectorAll('input[name="sites"]:checked').length;
+    const currentDirection = document.querySelector('.split-control.active')?.dataset.direction;
+    const warningElement = document.querySelector('.split-warning');
+    
+    if (!warningElement) return;
+
+    if (currentDirection === 'horizontal' && selectedSites >= 5) {
+      warningElement.textContent = 'Warning: Some windows may not be visible in horizontal split with 5 or more websites due to screen height constraints.';
+      warningElement.classList.add('visible');
+    } else if (currentDirection === 'vertical' && selectedSites >= 6) {
+      warningElement.textContent = 'Warning: Some windows may not be visible in vertical split with 6 or more websites due to screen width constraints.';
+      warningElement.classList.add('visible');
+    } else {
+      warningElement.classList.remove('visible');
+    }
+  }
+
+  // Add event listeners to checkboxes
+  document.querySelectorAll('input[name="sites"]').forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+      saveSettings();
+      updateSplitWarning();
+    });
+  });
+
+  // Add event listener for mode changes
+  document.querySelectorAll('input[name="mode"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      toggleSplitControls(e.target.value === 'split');
+      saveSettings();
+      updateSplitWarning();
+    });
+  });
+
+  // Initialize warning on load
+  updateSplitWarning();
 
   // Info tooltip functionality
   const infoButton = document.querySelector('.info-button');
