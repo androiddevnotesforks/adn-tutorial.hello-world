@@ -62,14 +62,14 @@ const URLS = {
   x: (prompt) => `https://x.com/i/grok?text=${prompt}`,
   chatgpt: (prompt) => `https://chatgpt.com/?q=${prompt}`,
   perplexity: (prompt) => `https://www.perplexity.ai/?q=${prompt}`,
-  google: (prompt) => `https://www.google.com/search?q=${prompt}`,
+  google: (prompt) => `https://www.google.com/search?q=${prompt}`
 };
 
-// Add event listeners to checkboxes to enforce 1-3 selection
+// Add event listeners to checkboxes to enforce 1-4 selection
 document.querySelectorAll('input[name="sites"]').forEach(checkbox => {
   checkbox.addEventListener('change', () => {
     const checked = document.querySelectorAll('input[name="sites"]:checked');
-    if (checked.length > 3) {
+    if (checked.length > 4) {
       checkbox.checked = false;
     }
     saveSettings();
