@@ -161,6 +161,7 @@
         display: flex;
         gap: 8px;
         align-items: center;
+        width: 100%;
       }
 
       .info-button {
@@ -188,8 +189,8 @@
       .info-tooltip {
         display: none;
         position: absolute;
-        left: -16px;
-        right: -16px;
+        left: 0;
+        right: 0;
         top: calc(100% + 4px);
         background: var(--section-bg);
         border: 1px solid var(--border);
@@ -220,6 +221,7 @@
         background: var(--section-bg);
         padding-bottom: 8px;
         border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
       }
 
       .info-tooltip-title {
@@ -229,19 +231,23 @@
 
       .info-tooltip-close {
         background: transparent;
-        border: none;
         color: var(--text-secondary);
-        padding: 4px;
-        margin: -4px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 2px 8px;
+        margin: 0;
+        font-size: 11px;
         cursor: pointer;
-        font-size: 16px;
-        width: auto;
+        white-space: nowrap;
+        line-height: 16px;
+        width: fit-content;
+        align-self: center;
       }
 
       .info-tooltip-close:hover {
+        background: rgba(255, 255, 255, 0.05);
         color: var(--text);
-        transform: none;
-        box-shadow: none;
+        border-color: var(--text-secondary);
       }
 
       .example-list {
@@ -262,8 +268,10 @@
 
       .example-url-wrapper {
         display: flex;
+        flex-direction: column;
         gap: 4px;
         margin-top: 2px;
+        width: 100%;
       }
 
       .example-url {
@@ -273,12 +281,14 @@
         background: var(--input-bg);
         padding: 3px 6px;
         border-radius: 4px;
-        flex-grow: 1;
         font-size: 11px;
         line-height: 16px;
+        width: 100%;
+        box-sizing: border-box;
       }
 
       .copy-button {
+        align-self: flex-end;
         background: transparent;
         color: var(--text-secondary);
         border: 1px solid var(--border);
@@ -347,7 +357,7 @@
             <div class="info-tooltip">
               <div class="info-tooltip-header">
                 <div class="info-tooltip-title">How to Add Custom Websites</div>
-                <button class="info-tooltip-close" title="Close">×</button>
+                <button class="info-tooltip-close" title="Close">Close</button>
               </div>
               <div>Replace your search term with <span class="example-url">{prompt}</span> in the URL. Common examples:</div>
               <ul class="example-list">
