@@ -9,7 +9,8 @@ function saveSettings() {
   document.querySelectorAll('.split-control.active').forEach(btn => {
     splitDirections[btn.dataset.site] = btn.dataset.direction;
   });
-  chrome.storage.local.set({ selectedSites, selectedMode, splitDirections });
+  const halfScreenHover = document.getElementById('halfScreenHover').checked;
+  chrome.storage.local.set({ selectedSites, selectedMode, splitDirections, halfScreenHover });
 }
 
 // Function to restore selected sites and mode
@@ -20,21 +21,25 @@ function restoreSettings() {
   });
   
   // Restore saved selections and mode
-  chrome.storage.local.get(['selectedSites', 'selectedMode', 'splitDirections'], (result) => {
+  chrome.storage.local.get(['selectedSites', 'selectedMode', 'splitDirections', 'halfScreenHover'], (result) => {
     // Handle site selections
     if (result.selectedSites && result.selectedSites.length > 0) {
-      // Use saved selections if they exist
       result.selectedSites.forEach(site => {
         const checkbox = document.querySelector(`input[value="${site}"]`);
         if (checkbox) checkbox.checked = true;
       });
     } else {
-      // Use defaults only if no saved selections exist
       const defaultSites = ['grok', 'chatgpt'];
       defaultSites.forEach(site => {
         const checkbox = document.querySelector(`input[value="${site}"]`);
         if (checkbox) checkbox.checked = true;
       });
+    }
+
+    // Handle half-screen hover setting
+    const halfScreenHoverCheckbox = document.getElementById('halfScreenHover');
+    if (halfScreenHoverCheckbox) {
+      halfScreenHoverCheckbox.checked = result.halfScreenHover || false;
     }
 
     // Handle display mode
@@ -222,6 +227,12 @@ document.getElementById('addCustomSite').addEventListener('click', () => {
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('promptInput').focus();
   
+  // Add event listener for half-screen hover checkbox
+  const halfScreenHoverCheckbox = document.getElementById('halfScreenHover');
+  if (halfScreenHoverCheckbox) {
+    halfScreenHoverCheckbox.addEventListener('change', saveSettings);
+  }
+
   // Initialize split controls for all websites (default and custom)
   document.querySelectorAll('.split-control').forEach(button => {
     button.addEventListener('click', () => {
@@ -552,6 +563,24 @@ async function executePrompt() {
                   });
                 })
               );
+
+              // Add half-screen hover effect for horizontal windows after 2 seconds if enabled
+              const halfScreenHoverEnabled = document.getElementById('halfScreenHover').checked;
+              if (halfScreenHoverEnabled) {
+                setTimeout(async () => {
+                  const horizontalWindows = windows.filter(w => w.direction === 'horizontal');
+                  if (horizontalWindows.length > 0) {
+                    await Promise.all(
+                      horizontalWindows.map(({ window }) => 
+                        chrome.windows.update(window.id, {
+                          width: Math.floor(screenWidth / 2),
+                          left: 0
+                        })
+                      )
+                    );
+                  }
+                }, 2000);
+              }
             } catch (error) {
               if (attempt < 3) {
                 const baseDelay = numWindows <= 1 ? 0 : numWindows * 300;
