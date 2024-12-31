@@ -104,10 +104,6 @@ function addWebsiteToUI(name) {
   // Add checkbox event listener
   const checkbox = label.querySelector('input[type="checkbox"]');
   checkbox.addEventListener('change', () => {
-    const checked = document.querySelectorAll('input[name="sites"]:checked');
-    if (checked.length > 4) {
-      checkbox.checked = false;
-    }
     saveSettings();
   });
   
@@ -177,15 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
   restoreCustomSites();
 });
 
-// Add event listeners to checkboxes to enforce 1-4 selection
+// Add event listeners to checkboxes
 document.querySelectorAll('input[name="sites"]').forEach(checkbox => {
-  checkbox.addEventListener('change', () => {
-    const checked = document.querySelectorAll('input[name="sites"]:checked');
-    if (checked.length > 4) {
-      checkbox.checked = false;
-    }
-    saveSettings();
-  });
+  checkbox.addEventListener('change', saveSettings);
 });
 
 // Add event listener for mode changes
