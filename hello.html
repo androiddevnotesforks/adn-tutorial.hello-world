@@ -518,6 +518,32 @@
       </div>
 
       <div class="section">
+        <div class="section-title">Display Mode</div>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="mode" value="normal">
+            <span>Normal Tabs</span>
+          </label>
+          <label>
+            <input type="radio" name="mode" value="split" checked>
+            <span>Split Screen</span>
+          </label>
+        </div>
+        <div class="split-controls">
+          <button class="split-all-button" data-direction="vertical">Make All Vertical</button>
+          <button class="split-all-button" data-direction="horizontal">Make All Horizontal</button>
+          <label class="half-screen-option">
+            <input type="checkbox" id="halfScreenHover" name="halfScreenHover">
+            <span>Smart Layout (H)</span>
+          </label>
+          <label class="half-screen-option">
+            <input type="checkbox" id="halfScreenVerticalHover" name="halfScreenVerticalHover">
+            <span>Smart Layout (V)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="section">
         <div class="section-title">Add Custom Website</div>
         <div style="display: flex; flex-direction: column; gap: 12px;">
           <input type="text" id="customSiteName" placeholder="Website name (e.g., Bing)" />
@@ -563,32 +589,6 @@
             </div>
           </div>
           <button id="addCustomSite" style="margin-top: 0;">Add Website</button>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">Display Mode</div>
-        <div class="radio-group">
-          <label>
-            <input type="radio" name="mode" value="normal">
-            <span>Normal Tabs</span>
-          </label>
-          <label>
-            <input type="radio" name="mode" value="split" checked>
-            <span>Split Screen</span>
-          </label>
-        </div>
-        <div class="split-controls">
-          <button class="split-all-button" data-direction="vertical">Make All Vertical</button>
-          <button class="split-all-button" data-direction="horizontal">Make All Horizontal</button>
-          <label class="half-screen-option">
-            <input type="checkbox" id="halfScreenHover" name="halfScreenHover">
-            <span>Smart Layout (H)</span>
-          </label>
-          <label class="half-screen-option">
-            <input type="checkbox" id="halfScreenVerticalHover" name="halfScreenVerticalHover">
-            <span>Smart Layout (V)</span>
-          </label>
         </div>
       </div>
 
