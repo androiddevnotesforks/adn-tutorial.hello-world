@@ -423,14 +423,14 @@ async function executePrompt() {
               );
             } catch (error) {
               if (attempt < 3) {
-                const baseDelay = numWindows <= 1 ? 0 : numWindows * 500;
+                const baseDelay = numWindows <= 1 ? 0 : numWindows * 300;
                 setTimeout(() => positionWindows(attempt + 1), baseDelay * attempt);
               }
             }
           };
 
           // Initial positioning with delay based on number of windows
-          const initialDelay = numWindows <= 1 ? 0 : numWindows * 500;
+          const initialDelay = numWindows <= 1 ? 0 : numWindows * 300;
           setTimeout(() => positionWindows(), initialDelay);
         } catch (error) {
           console.error('Error in split screen:', error);
