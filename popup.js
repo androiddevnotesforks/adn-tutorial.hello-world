@@ -9,10 +9,10 @@ function saveSettings() {
   document.querySelectorAll('.split-control.active').forEach(btn => {
     splitDirections[btn.dataset.site] = btn.dataset.direction;
   });
-  const halfScreenHover = document.getElementById('halfScreenHover').checked;
-  const halfScreenVerticalHover = document.getElementById('halfScreenVerticalHover').checked;
+  const smartLayoutHover = document.getElementById('smartLayoutHover').checked;
+  const smartLayoutVerticalHover = document.getElementById('smartLayoutVerticalHover').checked;
   const globalDirection = document.querySelector('.split-all-button.active')?.dataset.direction || null;
-  chrome.storage.local.set({ selectedSites, selectedMode, splitDirections, halfScreenHover, halfScreenVerticalHover, globalDirection });
+  chrome.storage.local.set({ selectedSites, selectedMode, splitDirections, smartLayoutHover, smartLayoutVerticalHover, globalDirection });
 }
 
 // Function to restore selected sites and mode
@@ -23,7 +23,7 @@ function restoreSettings() {
   });
   
   // Restore saved selections and mode
-  chrome.storage.local.get(['selectedSites', 'selectedMode', 'splitDirections', 'halfScreenHover', 'halfScreenVerticalHover', 'globalDirection'], (result) => {
+  chrome.storage.local.get(['selectedSites', 'selectedMode', 'splitDirections', 'smartLayoutHover', 'smartLayoutVerticalHover', 'globalDirection'], (result) => {
     // Handle site selections
     if (result.selectedSites && result.selectedSites.length > 0) {
       result.selectedSites.forEach(site => {
@@ -39,13 +39,13 @@ function restoreSettings() {
     }
 
     // Handle half-screen hover setting
-    const halfScreenHoverCheckbox = document.getElementById('halfScreenHover');
-    if (halfScreenHoverCheckbox) {
-      halfScreenHoverCheckbox.checked = result.halfScreenHover || false;
+    const smartLayoutHoverCheckbox = document.getElementById('smartLayoutHover');
+    if (smartLayoutHoverCheckbox) {
+      smartLayoutHoverCheckbox.checked = result.smartLayoutHover || false;
     }
-    const halfScreenVerticalHoverCheckbox = document.getElementById('halfScreenVerticalHover');
-    if (halfScreenVerticalHoverCheckbox) {
-      halfScreenVerticalHoverCheckbox.checked = result.halfScreenVerticalHover || false;
+    const smartLayoutVerticalHoverCheckbox = document.getElementById('smartLayoutVerticalHover');
+    if (smartLayoutVerticalHoverCheckbox) {
+      smartLayoutVerticalHoverCheckbox.checked = result.smartLayoutVerticalHover || false;
     }
 
     // Handle display mode
@@ -248,9 +248,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('promptInput').focus();
   
   // Add event listeners for half-screen hover checkboxes
-  const halfScreenHoverCheckbox = document.getElementById('halfScreenHover');
-  if (halfScreenHoverCheckbox) {
-    halfScreenHoverCheckbox.addEventListener('change', (e) => {
+  const smartLayoutHoverCheckbox = document.getElementById('smartLayoutHover');
+  if (smartLayoutHoverCheckbox) {
+    smartLayoutHoverCheckbox.addEventListener('change', (e) => {
       if (!e.target.checked) {
         // If unchecked and horizontal is the active global direction, set all to horizontal
         const horizontalButton = document.querySelector('.split-all-button[data-direction="horizontal"].active');
@@ -267,9 +267,9 @@ document.addEventListener('DOMContentLoaded', () => {
       saveSettings();
     });
   }
-  const halfScreenVerticalHoverCheckbox = document.getElementById('halfScreenVerticalHover');
-  if (halfScreenVerticalHoverCheckbox) {
-    halfScreenVerticalHoverCheckbox.addEventListener('change', (e) => {
+  const smartLayoutVerticalHoverCheckbox = document.getElementById('smartLayoutVerticalHover');
+  if (smartLayoutVerticalHoverCheckbox) {
+    smartLayoutVerticalHoverCheckbox.addEventListener('change', (e) => {
       if (!e.target.checked) {
         // If unchecked and vertical is the active global direction, set all to vertical
         const verticalButton = document.querySelector('.split-all-button[data-direction="vertical"].active');
@@ -389,10 +389,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       // Clear smart mode checkboxes when switching layouts
-      const halfScreenHoverCheckbox = document.getElementById('halfScreenHover');
-      const halfScreenVerticalHoverCheckbox = document.getElementById('halfScreenVerticalHover');
-      halfScreenHoverCheckbox.checked = false;
-      halfScreenVerticalHoverCheckbox.checked = false;
+      const smartLayoutHoverCheckbox = document.getElementById('smartLayoutHover');
+      const smartLayoutVerticalHoverCheckbox = document.getElementById('smartLayoutVerticalHover');
+      smartLayoutHoverCheckbox.checked = false;
+      smartLayoutVerticalHoverCheckbox.checked = false;
 
       // Update hover options visibility based on the active button
       toggleHoverOptions(button.classList.contains('active') ? direction : null);
@@ -539,19 +539,19 @@ function toggleSplitControls(show) {
 
 // Function to toggle hover options visibility based on global direction
 function toggleHoverOptions(direction) {
-  const halfScreenHoverOption = document.querySelector('label[for="halfScreenHover"], label.half-screen-option:has(#halfScreenHover)');
-  const halfScreenVerticalHoverOption = document.querySelector('label[for="halfScreenVerticalHover"], label.half-screen-option:has(#halfScreenVerticalHover)');
+  const smartLayoutHoverOption = document.querySelector('label[for="smartLayoutHover"], label.half-screen-option:has(#smartLayoutHover)');
+  const smartLayoutVerticalHoverOption = document.querySelector('label[for="smartLayoutVerticalHover"], label.half-screen-option:has(#smartLayoutVerticalHover)');
 
   if (direction === 'horizontal') {
-    halfScreenHoverOption.style.display = 'flex';
-    halfScreenVerticalHoverOption.style.display = 'none';
+    smartLayoutHoverOption.style.display = 'flex';
+    smartLayoutVerticalHoverOption.style.display = 'none';
   } else if (direction === 'vertical') {
-    halfScreenHoverOption.style.display = 'none';
-    halfScreenVerticalHoverOption.style.display = 'flex';
+    smartLayoutHoverOption.style.display = 'none';
+    smartLayoutVerticalHoverOption.style.display = 'flex';
   } else {
     // Hide both options when no direction is selected
-    halfScreenHoverOption.style.display = 'none';
-    halfScreenVerticalHoverOption.style.display = 'none';
+    smartLayoutHoverOption.style.display = 'none';
+    smartLayoutVerticalHoverOption.style.display = 'none';
   }
 }
 
@@ -644,13 +644,13 @@ async function executePrompt() {
           // Function to position windows with retry
           const positionWindows = async (attempt = 1) => {
             try {
-              const halfScreenHoverEnabled = document.getElementById('halfScreenHover').checked;
-              const halfScreenVerticalHoverEnabled = document.getElementById('halfScreenVerticalHover').checked;
+              const smartLayoutHoverEnabled = document.getElementById('smartLayoutHover').checked;
+              const smartLayoutVerticalHoverEnabled = document.getElementById('smartLayoutVerticalHover').checked;
 
               // If half-screen hover is enabled, apply those layouts directly
-              if (halfScreenHoverEnabled || halfScreenVerticalHoverEnabled) {
+              if (smartLayoutHoverEnabled || smartLayoutVerticalHoverEnabled) {
                 // Handle horizontal windows
-                if (halfScreenHoverEnabled) {
+                if (smartLayoutHoverEnabled) {
                   const horizontalWindows = windows.filter(w => w.direction === 'horizontal');
                   if (horizontalWindows.length > 0) {
                     const numHorizontal = horizontalWindows.length;
@@ -684,7 +684,7 @@ async function executePrompt() {
                 }
 
                 // Handle vertical windows
-                if (halfScreenVerticalHoverEnabled) {
+                if (smartLayoutVerticalHoverEnabled) {
                   const verticalWindows = windows.filter(w => w.direction === 'vertical');
                   if (verticalWindows.length > 0) {
                     const numVertical = verticalWindows.length;
