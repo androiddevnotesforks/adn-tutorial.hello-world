@@ -111,6 +111,19 @@
         padding: 8px 0;
       }
 
+      .split-options {
+        display: flex;
+        gap: 16px;
+        padding: 8px 0 0 32px;
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      .split-options.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
       button {
         width: 100%;
         padding: 12px;
@@ -413,6 +426,16 @@
           <label>
             <input type="radio" name="mode" value="split" checked>
             <span>Split Screen</span>
+          </label>
+        </div>
+        <div class="split-options active">
+          <label>
+            <input type="radio" name="split_direction" value="vertical" checked>
+            <span>Vertical Split</span>
+          </label>
+          <label>
+            <input type="radio" name="split_direction" value="horizontal">
+            <span>Horizontal Split</span>
           </label>
         </div>
       </div>

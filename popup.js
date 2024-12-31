@@ -5,7 +5,8 @@ function saveSettings() {
   const selectedSites = Array.from(document.querySelectorAll('input[name="sites"]:checked'))
     .map(cb => cb.value);
   const selectedMode = document.querySelector('input[name="mode"]:checked').value;
-  chrome.storage.local.set({ selectedSites, selectedMode });
+  const splitDirection = document.querySelector('input[name="split_direction"]:checked').value;
+  chrome.storage.local.set({ selectedSites, selectedMode, splitDirection });
 }
 
 // Function to restore selected sites and mode
@@ -16,7 +17,7 @@ function restoreSettings() {
   });
   
   // Restore saved selections and mode
-  chrome.storage.local.get(['selectedSites', 'selectedMode'], (result) => {
+  chrome.storage.local.get(['selectedSites', 'selectedMode', 'splitDirection'], (result) => {
     // Handle site selections
     if (result.selectedSites && result.selectedSites.length > 0) {
       // Use saved selections if they exist
@@ -36,11 +37,23 @@ function restoreSettings() {
     // Handle display mode
     if (result.selectedMode) {
       const modeInput = document.querySelector(`input[name="mode"][value="${result.selectedMode}"]`);
-      if (modeInput) modeInput.checked = true;
+      if (modeInput) {
+        modeInput.checked = true;
+        updateSplitOptionsVisibility(result.selectedMode === 'split');
+      }
     } else {
       // Default to split mode if no saved preference
       const splitModeInput = document.querySelector('input[name="mode"][value="split"]');
-      if (splitModeInput) splitModeInput.checked = true;
+      if (splitModeInput) {
+        splitModeInput.checked = true;
+        updateSplitOptionsVisibility(true);
+      }
+    }
+
+    // Handle split direction
+    if (result.splitDirection) {
+      const directionInput = document.querySelector(`input[name="split_direction"][value="${result.splitDirection}"]`);
+      if (directionInput) directionInput.checked = true;
     }
 
     // Save initial settings if this was the first load
@@ -48,6 +61,16 @@ function restoreSettings() {
       saveSettings();
     }
   });
+}
+
+// Function to update split options visibility
+function updateSplitOptionsVisibility(show) {
+  const splitOptions = document.querySelector('.split-options');
+  if (show) {
+    splitOptions.classList.add('active');
+  } else {
+    splitOptions.classList.remove('active');
+  }
 }
 
 // URL mapping
@@ -225,6 +248,14 @@ document.querySelectorAll('input[name="sites"]').forEach(checkbox => {
 
 // Add event listener for mode changes
 document.querySelectorAll('input[name="mode"]').forEach(radio => {
+  radio.addEventListener('change', (e) => {
+    updateSplitOptionsVisibility(e.target.value === 'split');
+    saveSettings();
+  });
+});
+
+// Add event listener for split direction changes
+document.querySelectorAll('input[name="split_direction"]').forEach(radio => {
   radio.addEventListener('change', saveSettings);
 });
 
@@ -258,6 +289,7 @@ async function executePrompt() {
       // Split screen mode
       const screenWidth = window.screen.availWidth;
       const screenHeight = window.screen.availHeight;
+      const splitDirection = document.querySelector('input[name="split_direction"]:checked').value;
       
       if (selectedSites.length === 1) {
         // Single window mode
@@ -266,9 +298,10 @@ async function executePrompt() {
           state: 'maximized'
         });
       } else {
-        // Two or three windows side by side
         const numWindows = selectedSites.length;
-        const windowWidth = Math.floor(screenWidth / numWindows);
+        const isVertical = splitDirection === 'vertical';
+        const windowWidth = isVertical ? Math.floor(screenWidth / numWindows) : screenWidth;
+        const windowHeight = isVertical ? screenHeight : Math.floor(screenHeight / numWindows);
         
         try {
           const windows = [];
@@ -277,10 +310,10 @@ async function executePrompt() {
           for (let i = 0; i < numWindows; i++) {
             const window = await chrome.windows.create({
               url: URLS[selectedSites[i]](encodedPrompt),
-              left: i * windowWidth,
-              top: 0,
+              left: isVertical ? i * windowWidth : 0,
+              top: isVertical ? 0 : i * windowHeight,
               width: windowWidth,
-              height: screenHeight,
+              height: windowHeight,
               state: 'normal'
             });
             windows.push(window);
@@ -292,10 +325,10 @@ async function executePrompt() {
               await Promise.all(
                 windows.map((window, index) => 
                   chrome.windows.update(window.id, {
-                    left: index * windowWidth,
-                    top: 0,
+                    left: isVertical ? index * windowWidth : 0,
+                    top: isVertical ? 0 : index * windowHeight,
                     width: windowWidth,
-                    height: screenHeight,
+                    height: windowHeight,
                     state: 'normal'
                   })
                 )
