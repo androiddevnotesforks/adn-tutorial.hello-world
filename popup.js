@@ -560,24 +560,11 @@ async function executePrompt() {
           // Function to position windows with retry
           const positionWindows = async (attempt = 1) => {
             try {
-              await Promise.all(
-                windows.map(({ window, direction, offset }) => {
-                  const isVertical = direction === 'vertical';
-                  return chrome.windows.update(window.id, {
-                    left: isVertical ? offset : 0,
-                    top: isVertical ? 0 : offset,
-                    width: isVertical ? verticalWidth : screenWidth,
-                    height: isVertical ? screenHeight : horizontalHeight,
-                    state: 'normal'
-                  });
-                })
-              );
-
-              // Add half-screen hover effects after 2 seconds if enabled
               const halfScreenHoverEnabled = document.getElementById('halfScreenHover').checked;
               const halfScreenVerticalHoverEnabled = document.getElementById('halfScreenVerticalHover').checked;
 
-              setTimeout(async () => {
+              // If half-screen hover is enabled, apply those layouts directly
+              if (halfScreenHoverEnabled || halfScreenVerticalHoverEnabled) {
                 // Handle horizontal windows
                 if (halfScreenHoverEnabled) {
                   const horizontalWindows = windows.filter(w => w.direction === 'horizontal');
@@ -594,7 +581,8 @@ async function executePrompt() {
                         width: Math.floor(screenWidth / 2),
                         height: leftHeight,
                         left: 0,
-                        top: i * leftHeight
+                        top: i * leftHeight,
+                        state: 'normal'
                       });
                     }
 
@@ -604,7 +592,8 @@ async function executePrompt() {
                         width: Math.floor(screenWidth / 2),
                         height: rightHeight,
                         left: Math.floor(screenWidth / 2),
-                        top: i * rightHeight
+                        top: i * rightHeight,
+                        state: 'normal'
                       });
                     }
                   }
@@ -626,7 +615,8 @@ async function executePrompt() {
                         width: topWidth,
                         height: Math.floor(screenHeight / 2),
                         left: i * topWidth,
-                        top: 0
+                        top: 0,
+                        state: 'normal'
                       });
                     }
 
@@ -636,12 +626,27 @@ async function executePrompt() {
                         width: bottomWidth,
                         height: Math.floor(screenHeight / 2),
                         left: i * bottomWidth,
-                        top: Math.floor(screenHeight / 2)
+                        top: Math.floor(screenHeight / 2),
+                        state: 'normal'
                       });
                     }
                   }
                 }
-              }, 2000);
+              } else {
+                // If no half-screen hover is enabled, position windows normally
+                await Promise.all(
+                  windows.map(({ window, direction, offset }) => {
+                    const isVertical = direction === 'vertical';
+                    return chrome.windows.update(window.id, {
+                      left: isVertical ? offset : 0,
+                      top: isVertical ? 0 : offset,
+                      width: isVertical ? verticalWidth : screenWidth,
+                      height: isVertical ? screenHeight : horizontalHeight,
+                      state: 'normal'
+                    });
+                  })
+                );
+              }
             } catch (error) {
               if (attempt < 3) {
                 const baseDelay = numWindows <= 1 ? 0 : numWindows * 300;
