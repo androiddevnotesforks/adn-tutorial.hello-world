@@ -27,7 +27,7 @@
 
       h1 {
         font-size: 20px;
-        margin: 0 0 16px 0;
+        margin: 0;
         color: var(--text);
         font-weight: 600;
       }
@@ -700,10 +700,54 @@
         background: rgba(255, 255, 255, 0.05);
         border-color: var(--text-secondary);
       }
+
+      .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .auto-close-timer.compact {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        border: none;
+      }
+
+      .auto-close-timer.compact input[type="number"] {
+        width: 50px;
+        padding: 2px 6px;
+        font-size: 12px;
+        text-align: center;
+        border-radius: 12px;
+        background: var(--section-bg);
+      }
+
+      .auto-close-timer.compact .timer-hint {
+        font-size: 9px;
+        color: var(--text-secondary);
+        white-space: nowrap;
+      }
+
+      /* Remove the old auto-close-timer styles */
+      .auto-close-timer {
+        display: none;
+      }
     </style>
   </head>
   <body>
-    <h1>AI Website Splitter</h1>
+    <div class="header-container">
+      <h1>AI Website Splitter</h1>
+      <div class="auto-close-timer compact">
+        <input type="number" id="autoCloseTimer" min="0" step="1" placeholder="0s">
+        <div class="timer-hint">Auto-close (seconds)</div>
+      </div>
+    </div>
     <div>
       <textarea id="promptInput" placeholder="Enter your prompt..."></textarea>
       <button id="sendButton">Send to AI</button>

@@ -766,7 +766,6 @@ function toggleSplitControls(show) {
   
   // Toggle the split-all buttons visibility
   const splitControls = document.querySelector('.split-controls');
-  const autoCloseTimer = document.querySelector('.auto-close-timer');
   
   if (splitControls) {
     if (show) {
@@ -776,12 +775,10 @@ function toggleSplitControls(show) {
     }
   }
 
-  if (autoCloseTimer) {
-    if (show) {
-      autoCloseTimer.classList.add('active');
-    } else {
-      autoCloseTimer.classList.remove('active');
-    }
+  // Show compact timer for split mode only
+  const compactTimer = document.querySelector('.auto-close-timer.compact');
+  if (compactTimer) {
+    compactTimer.style.display = show ? 'flex' : 'none';
   }
 }
 
