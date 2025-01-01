@@ -1092,7 +1092,7 @@ async function displaySavedPrompts() {
     const promptElement = document.createElement('div');
     promptElement.className = 'saved-prompt';
     promptElement.innerHTML = `
-      <span class="prompt-text">${prompt}</span>
+      <span class="prompt-text" data-full-text="${prompt.replace(/"/g, '&quot;')}">${prompt}</span>
       <span class="remove" title="Remove prompt">&times;</span>
     `;
 

@@ -758,6 +758,33 @@
         font-size: 12px;
         cursor: pointer;
         transition: all 0.2s ease;
+        max-width: 100%;
+      }
+
+      .saved-prompt .prompt-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 250px;
+        position: relative;
+      }
+
+      .saved-prompt .prompt-text:hover::after {
+        content: attr(data-full-text);
+        position: absolute;
+        left: 0;
+        top: 100%;
+        background: var(--section-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 8px;
+        font-size: 12px;
+        white-space: normal;
+        max-width: 300px;
+        word-wrap: break-word;
+        z-index: 1000;
+        box-shadow: var(--shadow);
+        margin-top: 4px;
       }
 
       .saved-prompt:hover {
