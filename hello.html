@@ -743,8 +743,31 @@
       .saved-prompts {
         margin-top: 8px;
         display: flex;
-        flex-wrap: wrap;
         gap: 8px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+      }
+
+      /* Scrollbar styling for saved prompts */
+      .saved-prompts::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      .saved-prompts::-webkit-scrollbar-track {
+        background: var(--section-bg);
+        border-radius: 3px;
+      }
+
+      .saved-prompts::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+
+      .saved-prompts::-webkit-scrollbar-thumb:hover {
+        background: var(--text-secondary);
       }
 
       .saved-prompt {
@@ -758,14 +781,14 @@
         font-size: 12px;
         cursor: pointer;
         transition: all 0.2s ease;
-        max-width: 100%;
+        flex-shrink: 0;
       }
 
       .saved-prompt .prompt-text {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 250px;
+        max-width: 200px;
         position: relative;
       }
 
