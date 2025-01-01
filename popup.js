@@ -734,6 +734,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       toggleAllButton.textContent = allChecked ? 'Unselect All' : 'Select All';
     }
   });
+
+  // Initialize saved prompts
+  displaySavedPrompts();
+  
+  // Add save prompt button listener
+  document.getElementById('savePrompt').addEventListener('click', savePrompt);
 });
 
 // Add event listeners to checkboxes
@@ -1057,3 +1063,52 @@ document.getElementById('promptInput').addEventListener('keydown', (event) => {
 
 // Listen for button click
 document.getElementById('sendButton').addEventListener('click', executePrompt);
+
+// Function to save a prompt
+async function savePrompt() {
+  const promptText = document.getElementById('promptInput').value.trim();
+  if (!promptText) return;
+
+  // Get existing saved prompts
+  const result = await chrome.storage.local.get(['savedPrompts']);
+  const savedPrompts = result.savedPrompts || [];
+
+  // Don't save duplicates
+  if (!savedPrompts.includes(promptText)) {
+    savedPrompts.push(promptText);
+    await chrome.storage.local.set({ savedPrompts });
+    displaySavedPrompts();
+  }
+}
+
+// Function to display saved prompts
+async function displaySavedPrompts() {
+  const savedPromptsContainer = document.getElementById('savedPrompts');
+  const result = await chrome.storage.local.get(['savedPrompts']);
+  const savedPrompts = result.savedPrompts || [];
+
+  savedPromptsContainer.innerHTML = '';
+  savedPrompts.forEach((prompt) => {
+    const promptElement = document.createElement('div');
+    promptElement.className = 'saved-prompt';
+    promptElement.innerHTML = `
+      <span class="prompt-text">${prompt}</span>
+      <span class="remove" title="Remove prompt">&times;</span>
+    `;
+
+    // Load prompt when clicked
+    promptElement.querySelector('.prompt-text').addEventListener('click', () => {
+      document.getElementById('promptInput').value = prompt;
+    });
+
+    // Remove prompt when X is clicked
+    promptElement.querySelector('.remove').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const updatedPrompts = savedPrompts.filter(p => p !== prompt);
+      await chrome.storage.local.set({ savedPrompts: updatedPrompts });
+      displaySavedPrompts();
+    });
+
+    savedPromptsContainer.appendChild(promptElement);
+  });
+}
