@@ -712,19 +712,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Add select/unselect all functionality
-  document.getElementById('selectAllSites').addEventListener('click', () => {
-    document.querySelectorAll('input[name="sites"]').forEach(checkbox => {
-      checkbox.checked = true;
+  // Add toggle all functionality
+  const toggleAllButton = document.getElementById('toggleAllSites');
+  toggleAllButton.addEventListener('click', () => {
+    const checkboxes = document.querySelectorAll('input[name="sites"]');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    
+    checkboxes.forEach(checkbox => {
+      checkbox.checked = !allChecked;
     });
+    
+    toggleAllButton.textContent = allChecked ? 'Select All' : 'Unselect All';
     saveSettings();
   });
 
-  document.getElementById('unselectAllSites').addEventListener('click', () => {
-    document.querySelectorAll('input[name="sites"]').forEach(checkbox => {
-      checkbox.checked = false;
-    });
-    saveSettings();
+  // Update toggle button text on any checkbox change
+  document.querySelector('.checkbox-group').addEventListener('change', (e) => {
+    if (e.target.type === 'checkbox') {
+      const checkboxes = document.querySelectorAll('input[name="sites"]');
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      toggleAllButton.textContent = allChecked ? 'Unselect All' : 'Select All';
+    }
   });
 });
 
