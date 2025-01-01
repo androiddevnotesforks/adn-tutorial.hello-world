@@ -647,16 +647,15 @@ async function executePrompt() {
           active: false // Keep the current tab active
         });
         
-        // If it's Google or ChatGPT, set a timeout to close it
-        if (site === 'google' || site === 'chatgpt') {
-          setTimeout(async () => {
-            try {
-              await chrome.tabs.remove(tab.id);
-            } catch (error) {
-              console.error(`Error closing ${site} tab:`, error);
-            }
-          }, 2000);
-        }
+        // Set a timeout to close all tabs
+        setTimeout(async () => {
+          try {
+            await chrome.tabs.remove(tab.id);
+          } catch (error) {
+            console.error(`Error closing ${site} tab:`, error);
+          }
+        }, 2000);
+        
         return tab;
       });
       
@@ -674,16 +673,14 @@ async function executePrompt() {
           state: 'maximized'
         });
         
-        // If it's Google or ChatGPT, set a timeout to close it
-        if (selectedSites[0] === 'google' || selectedSites[0] === 'chatgpt') {
-          setTimeout(async () => {
-            try {
-              await chrome.windows.remove(window.id);
-            } catch (error) {
-              console.error(`Error closing ${selectedSites[0]} window:`, error);
-            }
-          }, 2000);
-        }
+        // Set a timeout to close the window
+        setTimeout(async () => {
+          try {
+            await chrome.windows.remove(window.id);
+          } catch (error) {
+            console.error(`Error closing ${selectedSites[0]} window:`, error);
+          }
+        }, 2000);
       } else {
         const numWindows = selectedSites.length;
         let verticalCount = 0;
@@ -720,16 +717,14 @@ async function executePrompt() {
               state: 'normal'
             });
             
-            // If it's Google or ChatGPT, set a timeout to close it
-            if (site === 'google' || site === 'chatgpt') {
-              setTimeout(async () => {
-                try {
-                  await chrome.windows.remove(window.id);
-                } catch (error) {
-                  console.error(`Error closing ${site} window:`, error);
-                }
-              }, 2000);
-            }
+            // Set a timeout to close the window
+            setTimeout(async () => {
+              try {
+                await chrome.windows.remove(window.id);
+              } catch (error) {
+                console.error(`Error closing ${site} window:`, error);
+              }
+            }, 2000);
             
             if (isVertical) {
               currentVerticalOffset += verticalWidth;
