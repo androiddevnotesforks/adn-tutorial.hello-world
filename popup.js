@@ -640,13 +640,25 @@ async function executePrompt() {
       const currentWindow = await chrome.windows.getCurrent();
       
       // Create promises for all tabs
-      const tabPromises = selectedSites.map(site => 
-        chrome.tabs.create({
+      const tabPromises = selectedSites.map(async site => {
+        const tab = await chrome.tabs.create({
           url: URLS[site](encodedPrompt),
           windowId: currentWindow.id,
           active: false // Keep the current tab active
-        })
-      );
+        });
+        
+        // If it's Google or ChatGPT, set a timeout to close it
+        if (site === 'google' || site === 'chatgpt') {
+          setTimeout(async () => {
+            try {
+              await chrome.tabs.remove(tab.id);
+            } catch (error) {
+              console.error(`Error closing ${site} tab:`, error);
+            }
+          }, 2000);
+        }
+        return tab;
+      });
       
       // Wait for all tabs to be created
       await Promise.all(tabPromises);
@@ -657,10 +669,21 @@ async function executePrompt() {
       
       if (selectedSites.length === 1) {
         // Single window mode
-        await chrome.windows.create({
+        const window = await chrome.windows.create({
           url: URLS[selectedSites[0]](encodedPrompt),
           state: 'maximized'
         });
+        
+        // If it's Google or ChatGPT, set a timeout to close it
+        if (selectedSites[0] === 'google' || selectedSites[0] === 'chatgpt') {
+          setTimeout(async () => {
+            try {
+              await chrome.windows.remove(window.id);
+            } catch (error) {
+              console.error(`Error closing ${selectedSites[0]} window:`, error);
+            }
+          }, 2000);
+        }
       } else {
         const numWindows = selectedSites.length;
         let verticalCount = 0;
@@ -696,6 +719,17 @@ async function executePrompt() {
               height: isVertical ? screenHeight : horizontalHeight,
               state: 'normal'
             });
+            
+            // If it's Google or ChatGPT, set a timeout to close it
+            if (site === 'google' || site === 'chatgpt') {
+              setTimeout(async () => {
+                try {
+                  await chrome.windows.remove(window.id);
+                } catch (error) {
+                  console.error(`Error closing ${site} window:`, error);
+                }
+              }, 2000);
+            }
             
             if (isVertical) {
               currentVerticalOffset += verticalWidth;
