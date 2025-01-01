@@ -261,7 +261,8 @@ document.getElementById('addCustomSite').addEventListener('click', () => {
     return;
   }
   
-  if (URLS[name]) {
+  // Check if website already exists (case-insensitive check)
+  if (Object.keys(URLS).some(key => key.toLowerCase() === name.toLowerCase())) {
     showError('A website with this name already exists', nameInput);
     return;
   }
@@ -295,10 +296,10 @@ document.getElementById('addCustomSite').addEventListener('click', () => {
     return;
   }
   
-  // Add to URLS object
+  // Add to URLS object with original case
   URLS[name] = (prompt) => urlTemplate.replace('{prompt}', prompt);
   
-  // Add to UI
+  // Add to UI with original case
   addWebsiteToUI(name);
   
   // Save to storage
@@ -596,19 +597,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const name = button.dataset.name;
       const urlTemplate = button.dataset.url;
       
-      // Check if website already exists
-      if (URLS[name.toLowerCase()]) {
+      // Check if website already exists (case-insensitive check)
+      if (Object.keys(URLS).some(key => key.toLowerCase() === name.toLowerCase())) {
         const errorElement = document.getElementById('customSiteError');
         errorElement.textContent = 'This website already exists';
         errorElement.classList.add('visible');
         return;
       }
 
-      // Add to URLS object
-      URLS[name.toLowerCase()] = (prompt) => urlTemplate.replace('{prompt}', prompt);
+      // Add to URLS object with original case
+      URLS[name] = (prompt) => urlTemplate.replace('{prompt}', prompt);
       
-      // Add to UI
-      addWebsiteToUI(name.toLowerCase());
+      // Add to UI with original case
+      addWebsiteToUI(name);
       
       // Save to storage
       saveCustomSites();
