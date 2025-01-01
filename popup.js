@@ -52,7 +52,7 @@ function restoreSettings() {
       });
     } else {
       // Set default selections only for sites that still exist
-      const defaultSites = ['grok', 'chatgpt'];
+      const defaultSites = ['Grok', 'ChatGPT'];
       defaultSites.forEach(site => {
         if (URLS[site]) {
           const checkbox = document.querySelector(`input[value="${site}"]`);
@@ -154,13 +154,15 @@ async function initializeURLs() {
   // Get removed defaults first
   const result = await chrome.storage.local.get(['removedDefaults']);
   const removedDefaults = result.removedDefaults || [];
+  console.log('Removed defaults:', removedDefaults);
   
-  // Add non-removed default URLs
+  // Add non-removed default URLs, using case-sensitive comparison
   Object.entries(INITIAL_DEFAULT_URLS).forEach(([key, fn]) => {
     if (!removedDefaults.includes(key)) {
       URLS[key] = fn;
     }
   });
+  console.log('After adding defaults:', Object.keys(URLS));
   
   // Get and add custom sites
   const customResult = await chrome.storage.local.get(['customSites']);
@@ -169,11 +171,14 @@ async function initializeURLs() {
       URLS[key] = (prompt) => template.replace('{prompt}', prompt);
     });
   }
+  console.log('Final URLS:', Object.keys(URLS));
 }
 
 // Function to save removed default sites
 function saveRemovedDefaultSites() {
+  // Get the original case keys from INITIAL_DEFAULT_URLS that are not in URLS
   const removedDefaults = Object.keys(INITIAL_DEFAULT_URLS).filter(key => !URLS[key]);
+  console.log('Saving removed defaults:', removedDefaults);
   chrome.storage.local.set({ removedDefaults });
 }
 
@@ -364,6 +369,16 @@ document.getElementById('addCustomSite').addEventListener('click', () => {
   
   // Add to URLS object with original case
   URLS[name] = (prompt) => urlTemplate.replace('{prompt}', prompt);
+  
+  // If this is a default site being re-added, remove it from removedDefaults
+  if (INITIAL_DEFAULT_URLS[name]) {
+    chrome.storage.local.get(['removedDefaults'], (result) => {
+      const removedDefaults = result.removedDefaults || [];
+      const updatedRemovedDefaults = removedDefaults.filter(site => site !== name);
+      chrome.storage.local.set({ removedDefaults: updatedRemovedDefaults });
+      console.log('Updated removed defaults:', updatedRemovedDefaults);
+    });
+  }
   
   // Add to UI with original case and save settings
   addWebsiteToUI(name, false);
@@ -664,6 +679,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Add to URLS object with original case
       URLS[name] = (prompt) => url.replace('{prompt}', prompt);
+      
+      // If this is a default site being re-added, remove it from removedDefaults
+      if (INITIAL_DEFAULT_URLS[name]) {
+        chrome.storage.local.get(['removedDefaults'], (result) => {
+          const removedDefaults = result.removedDefaults || [];
+          const updatedRemovedDefaults = removedDefaults.filter(site => site !== name);
+          chrome.storage.local.set({ removedDefaults: updatedRemovedDefaults });
+          console.log('Updated removed defaults (quick-add):', updatedRemovedDefaults);
+        });
+      }
       
       // Add to UI and check the checkbox
       addWebsiteToUI(name, false);
