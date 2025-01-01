@@ -121,6 +121,51 @@
         gap: 8px;
       }
 
+      .quick-add-websites {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 8px 0;
+        margin: 8px 0;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+      }
+
+      .quick-add-websites::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      .quick-add-websites::-webkit-scrollbar-track {
+        background: var(--section-bg);
+        border-radius: 3px;
+      }
+
+      .quick-add-websites::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+
+      .quick-add-websites::-webkit-scrollbar-thumb:hover {
+        background: var(--text-secondary);
+      }
+
+      .quick-add-button {
+        padding: 6px 12px;
+        background: var(--section-bg);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        font-size: 12px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+      }
+
+      .quick-add-button:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--text-secondary);
+      }
+
       .website-item {
         display: flex;
         align-items: center;
@@ -642,6 +687,19 @@
         <div class="section-title">Select Websites</div>
         <div class="checkbox-group">
           <!-- Default websites will be added here dynamically -->
+        </div>
+        <div class="quick-add-websites">
+          <!-- Quick add buttons will be populated from the example list -->
+          <button class="quick-add-button" data-name="Grok" data-url="https://grok.com/chat?q={prompt}">Grok</button>
+          <button class="quick-add-button" data-name="X" data-url="https://x.com/i/grok?text={prompt}">X</button>
+          <button class="quick-add-button" data-name="ChatGPT" data-url="https://chatgpt.com/?q={prompt}">ChatGPT</button>
+          <button class="quick-add-button" data-name="Claude" data-url="https://claude.ai/new?q={prompt}">Claude</button>
+          <button class="quick-add-button" data-name="Perplexity" data-url="https://www.perplexity.ai/?q={prompt}">Perplexity</button>
+          <button class="quick-add-button" data-name="Google" data-url="https://www.google.com/search?q={prompt}">Google</button>
+          <button class="quick-add-button" data-name="Bing" data-url="https://www.bing.com/search?q={prompt}">Bing</button>
+          <button class="quick-add-button" data-name="Brave" data-url="https://search.brave.com/search?q={prompt}">Brave</button>
+          <button class="quick-add-button" data-name="DuckDuckGo" data-url="https://duckduckgo.com/?q={prompt}">DuckDuckGo</button>
+          <button class="quick-add-button" data-name="Yahoo" data-url="https://search.yahoo.com/search?p={prompt}">Yahoo</button>
         </div>
       </div>
 

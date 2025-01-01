@@ -470,68 +470,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // First restore custom sites without saving settings
-  chrome.storage.local.get(['customSites'], (result) => {
-    if (result.customSites) {
-      Object.entries(result.customSites).forEach(([key, template]) => {
-        // Create the function from the template
-        URLS[key] = (prompt) => template.replace('{prompt}', prompt);
-        // Add to UI without saving settings
-        const checkboxGroup = document.querySelector('.checkbox-group');
-        const websiteItem = document.createElement('div');
-        websiteItem.className = 'website-item';
-        
-        websiteItem.innerHTML = `
-          <input type="checkbox" name="sites" value="${key}">
-          <span>${key}</span>
-          <div class="website-controls">
-            <button class="split-control active" data-site="${key}" data-direction="vertical">Vertical</button>
-            <button class="split-control" data-site="${key}" data-direction="horizontal">Horizontal</button>
-            <button class="remove-site" title="Remove this website">Remove</button>
-          </div>
-        `;
-        
-        // Add checkbox event listener
-        const checkbox = websiteItem.querySelector('input[type="checkbox"]');
-        checkbox.addEventListener('change', () => {
-          saveSettings();
-        });
-        
-        // Add split control listeners
-        websiteItem.querySelectorAll('.split-control').forEach(button => {
-          button.addEventListener('click', () => {
-            const site = button.dataset.site;
-            const direction = button.dataset.direction;
-            
-            const otherDirection = direction === 'vertical' ? 'horizontal' : 'vertical';
-            const otherButton = websiteItem.querySelector(`.split-control[data-direction="${otherDirection}"]`);
-            
-            if (otherButton) {
-              otherButton.classList.remove('active');
-            }
-            button.classList.add('active');
-            
-            saveSettings();
-          });
-        });
-        
-        const removeButton = websiteItem.querySelector('.remove-site');
-        if (removeButton) {
-          removeButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            delete URLS[key];
-            websiteItem.remove();
-            saveCustomSites();
-            saveSettings();
-          });
-        }
-        
-        checkboxGroup.appendChild(websiteItem);
-      });
-    }
-  });
-
   // Then restore settings
   restoreSettings();
 
@@ -699,6 +637,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         button.style.borderColor = '';
         button.disabled = false;
       }, 2000);
+    });
+  });
+
+  // Add event listeners for quick-add buttons
+  document.querySelectorAll('.quick-add-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const name = button.dataset.name;
+      const url = button.dataset.url;
+      
+      // Check if website already exists
+      if (Object.keys(URLS).some(key => key.toLowerCase() === name.toLowerCase())) {
+        // If it exists, just check its checkbox
+        const checkbox = document.querySelector(`input[name="sites"][value="${name}"]`);
+        if (checkbox && !checkbox.checked) {
+          checkbox.checked = true;
+          saveSettings();
+        }
+        return;
+      }
+
+      // Add to URLS object with original case
+      URLS[name] = (prompt) => url.replace('{prompt}', prompt);
+      
+      // Add to UI and check the checkbox
+      addWebsiteToUI(name, false);
+      const checkbox = document.querySelector(`input[name="sites"][value="${name}"]`);
+      if (checkbox) {
+        checkbox.checked = true;
+      }
+      
+      // Save to storage
+      saveCustomSites();
+      saveSettings();
+      
+      // Show success feedback
+      button.classList.add('active');
+      setTimeout(() => {
+        button.classList.remove('active');
+      }, 1000);
     });
   });
 });
