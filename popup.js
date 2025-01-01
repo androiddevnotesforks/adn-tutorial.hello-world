@@ -44,14 +44,20 @@ function restoreSettings() {
     // Handle site selections
     if (result.selectedSites && result.selectedSites.length > 0) {
       result.selectedSites.forEach(site => {
-        const checkbox = document.querySelector(`input[value="${site}"]`);
-        if (checkbox) checkbox.checked = true;
+        // Only restore selection if the site still exists
+        if (URLS[site]) {
+          const checkbox = document.querySelector(`input[value="${site}"]`);
+          if (checkbox) checkbox.checked = true;
+        }
       });
     } else {
+      // Set default selections only for sites that still exist
       const defaultSites = ['grok', 'chatgpt'];
       defaultSites.forEach(site => {
-        const checkbox = document.querySelector(`input[value="${site}"]`);
-        if (checkbox) checkbox.checked = true;
+        if (URLS[site]) {
+          const checkbox = document.querySelector(`input[value="${site}"]`);
+          if (checkbox) checkbox.checked = true;
+        }
       });
     }
 
@@ -128,7 +134,7 @@ function restoreSettings() {
 }
 
 // URL mapping
-const DEFAULT_URLS = {
+const INITIAL_DEFAULT_URLS = {
   grok: (prompt) => `https://grok.com/chat?q=${prompt}`,
   x: (prompt) => `https://x.com/i/grok?text=${prompt}`,
   chatgpt: (prompt) => `https://chatgpt.com/?q=${prompt}`,
@@ -137,38 +143,53 @@ const DEFAULT_URLS = {
   google: (prompt) => `https://www.google.com/search?q=${prompt}`
 };
 
-let URLS = { ...DEFAULT_URLS };
+// Initialize URLs
+let URLS = {};
 
-// Function to save custom sites
-function saveCustomSites() {
-  const customSites = Object.keys(URLS).reduce((acc, key) => {
-    if (!DEFAULT_URLS[key]) {
-      // Store the URL template directly
-      const fn = URLS[key];
-      const dummyPrompt = '{prompt}';
-      const template = fn(dummyPrompt);
-      acc[key] = template;
+// Function to initialize URLs
+async function initializeURLs() {
+  // Start with a clean slate
+  URLS = {};
+  
+  // Get removed defaults first
+  const result = await chrome.storage.local.get(['removedDefaults']);
+  const removedDefaults = result.removedDefaults || [];
+  
+  // Add non-removed default URLs
+  Object.entries(INITIAL_DEFAULT_URLS).forEach(([key, fn]) => {
+    if (!removedDefaults.includes(key)) {
+      URLS[key] = fn;
     }
-    return acc;
-  }, {});
-  chrome.storage.local.set({ customSites });
+  });
+  
+  // Get and add custom sites
+  const customResult = await chrome.storage.local.get(['customSites']);
+  if (customResult.customSites) {
+    Object.entries(customResult.customSites).forEach(([key, template]) => {
+      URLS[key] = (prompt) => template.replace('{prompt}', prompt);
+    });
+  }
 }
 
-// Function to restore custom sites
-function restoreCustomSites() {
-  chrome.storage.local.get(['customSites'], (result) => {
-    if (result.customSites) {
-      Object.entries(result.customSites).forEach(([key, template]) => {
-        // Create the function from the template
-        URLS[key] = (prompt) => template.replace('{prompt}', prompt);
-        addWebsiteToUI(key);
-      });
-    }
+// Function to save removed default sites
+function saveRemovedDefaultSites() {
+  const removedDefaults = Object.keys(INITIAL_DEFAULT_URLS).filter(key => !URLS[key]);
+  chrome.storage.local.set({ removedDefaults });
+}
+
+// Function to initialize default websites in UI
+function initializeWebsitesUI() {
+  const checkboxGroup = document.querySelector('.checkbox-group');
+  checkboxGroup.innerHTML = ''; // Clear existing items
+  
+  // Add all current websites
+  Object.keys(URLS).forEach(name => {
+    addWebsiteToUI(name);
   });
 }
 
 // Function to add a website to the UI
-function addWebsiteToUI(name) {
+function addWebsiteToUI(name, skipSaveSettings = true) {
   const checkboxGroup = document.querySelector('.checkbox-group');
   const websiteItem = document.createElement('div');
   websiteItem.className = 'website-item';
@@ -180,7 +201,7 @@ function addWebsiteToUI(name) {
     <div class="website-controls">
       <button class="split-control active" data-site="${name}" data-direction="vertical">Vertical</button>
       <button class="split-control" data-site="${name}" data-direction="horizontal">Horizontal</button>
-      ${!DEFAULT_URLS[name] ? '<button class="remove-site" title="Remove this website">Remove</button>' : ''}
+      <button class="remove-site" title="Remove this website">Remove</button>
     </div>
   `;
   
@@ -209,25 +230,65 @@ function addWebsiteToUI(name) {
     });
   });
   
-  if (!DEFAULT_URLS[name]) {
-    const removeButton = websiteItem.querySelector('.remove-site');
-    if (removeButton) {
-      removeButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        delete URLS[name];
-        websiteItem.remove();
+  // Add remove button listener
+  const removeButton = websiteItem.querySelector('.remove-site');
+  if (removeButton) {
+    removeButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Remove from URLS
+      delete URLS[name];
+      
+      // Remove from UI
+      websiteItem.remove();
+      
+      // Save appropriate storage
+      if (INITIAL_DEFAULT_URLS[name]) {
+        saveRemovedDefaultSites();
+      } else {
         saveCustomSites();
-        saveSettings();
-      });
-    }
+      }
+      
+      saveSettings();
+    });
   }
   
   // Insert at the end of the checkbox group
   checkboxGroup.appendChild(websiteItem);
   
-  // Save settings without automatically checking the checkbox
-  saveSettings();
+  // Only save settings if not skipped (for initial load)
+  if (!skipSaveSettings) {
+    saveSettings();
+  }
+}
+
+// Function to save custom sites
+function saveCustomSites() {
+  const customSites = Object.keys(URLS).reduce((acc, key) => {
+    if (!INITIAL_DEFAULT_URLS[key]) {
+      // Store the URL template directly
+      const fn = URLS[key];
+      const dummyPrompt = '{prompt}';
+      const template = fn(dummyPrompt);
+      acc[key] = template;
+    }
+    return acc;
+  }, {});
+  chrome.storage.local.set({ customSites });
+}
+
+// Function to restore custom sites
+function restoreCustomSites() {
+  chrome.storage.local.get(['customSites'], (result) => {
+    if (result.customSites) {
+      Object.entries(result.customSites).forEach(([key, template]) => {
+        // Create the function from the template
+        URLS[key] = (prompt) => template.replace('{prompt}', prompt);
+        addWebsiteToUI(key);
+      });
+    }
+  });
 }
 
 // Add custom website handler
@@ -299,8 +360,8 @@ document.getElementById('addCustomSite').addEventListener('click', () => {
   // Add to URLS object with original case
   URLS[name] = (prompt) => urlTemplate.replace('{prompt}', prompt);
   
-  // Add to UI with original case
-  addWebsiteToUI(name);
+  // Add to UI with original case and save settings
+  addWebsiteToUI(name, false);
   
   // Save to storage
   saveCustomSites();
@@ -321,9 +382,18 @@ document.getElementById('customSiteUrl').addEventListener('input', () => {
 });
 
 // Initialize custom sites on load
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('promptInput').focus();
   
+  // Initialize URLs first
+  await initializeURLs();
+  
+  // Then initialize UI (without saving settings)
+  initializeWebsitesUI();
+  
+  // Finally restore settings
+  restoreSettings();
+
   // Update keyboard shortcut based on platform
   const isMac = navigator.platform.toLowerCase().includes('mac');
   const shortcutElement = document.querySelector('.shortcut-footer');
@@ -609,7 +679,7 @@ document.addEventListener('DOMContentLoaded', () => {
       URLS[name] = (prompt) => urlTemplate.replace('{prompt}', prompt);
       
       // Add to UI with original case
-      addWebsiteToUI(name);
+      addWebsiteToUI(name, false);
       
       // Save to storage
       saveCustomSites();
