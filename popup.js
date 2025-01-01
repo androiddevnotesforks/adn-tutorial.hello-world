@@ -589,6 +589,47 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  // Add event listeners for add buttons in examples
+  document.querySelectorAll('.add-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const name = button.dataset.name;
+      const urlTemplate = button.dataset.url;
+      
+      // Check if website already exists
+      if (URLS[name.toLowerCase()]) {
+        const errorElement = document.getElementById('customSiteError');
+        errorElement.textContent = 'This website already exists';
+        errorElement.classList.add('visible');
+        return;
+      }
+
+      // Add to URLS object
+      URLS[name.toLowerCase()] = (prompt) => urlTemplate.replace('{prompt}', prompt);
+      
+      // Add to UI
+      addWebsiteToUI(name.toLowerCase());
+      
+      // Save to storage
+      saveCustomSites();
+      
+      // Show success feedback
+      button.textContent = 'Added!';
+      button.style.background = 'rgba(0, 255, 0, 0.1)';
+      button.style.color = '#4CAF50';
+      button.style.borderColor = 'rgba(76, 175, 80, 0.3)';
+      button.disabled = true;
+      
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.textContent = 'Add';
+        button.style.background = '';
+        button.style.color = '';
+        button.style.borderColor = '';
+        button.disabled = false;
+      }, 2000);
+    });
+  });
 });
 
 // Add event listeners to checkboxes

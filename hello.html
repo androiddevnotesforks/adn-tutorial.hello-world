@@ -435,6 +435,12 @@
         width: 100%;
       }
 
+      .example-buttons {
+        display: flex;
+        gap: 4px;
+        align-self: flex-end;
+      }
+
       .example-url {
         color: var(--text);
         word-break: break-all;
@@ -448,8 +454,7 @@
         box-sizing: border-box;
       }
 
-      .copy-button {
-        align-self: flex-end;
+      .copy-button, .add-button {
         background: transparent;
         color: var(--text-secondary);
         border: 1px solid var(--border);
@@ -463,10 +468,15 @@
         line-height: 16px;
       }
 
-      .copy-button:hover {
+      .copy-button:hover, .add-button:hover {
         background: rgba(255, 255, 255, 0.05);
         color: var(--text);
         border-color: var(--text-secondary);
+      }
+
+      .add-button:hover {
+        color: #4CAF50;
+        border-color: #4CAF50;
       }
 
       .copy-button.copied {
@@ -733,28 +743,40 @@
                   <strong>Bing Search</strong>
                   <div class="example-url-wrapper">
                     <span class="example-url">https://www.bing.com/search?q={prompt}</span>
-                    <button class="copy-button" data-url="https://www.bing.com/search?q={prompt}">Copy</button>
+                    <div class="example-buttons">
+                      <button class="copy-button" data-url="https://www.bing.com/search?q={prompt}">Copy</button>
+                      <button class="add-button" data-name="Bing" data-url="https://www.bing.com/search?q={prompt}">Add</button>
+                    </div>
                   </div>
                 </li>
                 <li>
                   <strong>Brave Search</strong>
                   <div class="example-url-wrapper">
                     <span class="example-url">https://search.brave.com/search?q={prompt}</span>
-                    <button class="copy-button" data-url="https://search.brave.com/search?q={prompt}">Copy</button>
+                    <div class="example-buttons">
+                      <button class="copy-button" data-url="https://search.brave.com/search?q={prompt}">Copy</button>
+                      <button class="add-button" data-name="Brave" data-url="https://search.brave.com/search?q={prompt}">Add</button>
+                    </div>
                   </div>
                 </li>
                 <li>
                   <strong>DuckDuckGo</strong>
                   <div class="example-url-wrapper">
                     <span class="example-url">https://duckduckgo.com/?q={prompt}</span>
-                    <button class="copy-button" data-url="https://duckduckgo.com/?q={prompt}">Copy</button>
+                    <div class="example-buttons">
+                      <button class="copy-button" data-url="https://duckduckgo.com/?q={prompt}">Copy</button>
+                      <button class="add-button" data-name="DuckDuckGo" data-url="https://duckduckgo.com/?q={prompt}">Add</button>
+                    </div>
                   </div>
                 </li>
                 <li>
                   <strong>Yahoo Search</strong>
                   <div class="example-url-wrapper">
                     <span class="example-url">https://search.yahoo.com/search?p={prompt}</span>
-                    <button class="copy-button" data-url="https://search.yahoo.com/search?p={prompt}">Copy</button>
+                    <div class="example-buttons">
+                      <button class="copy-button" data-url="https://search.yahoo.com/search?p={prompt}">Copy</button>
+                      <button class="add-button" data-name="Yahoo" data-url="https://search.yahoo.com/search?p={prompt}">Add</button>
+                    </div>
                   </div>
                 </li>
               </ul>
