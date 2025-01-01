@@ -60,6 +60,45 @@
         box-shadow: 0 0 0 3px rgba(128, 128, 128, 0.1);
       }
 
+      /* Custom checkbox styling */
+      input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border);
+        border-radius: 4px;
+        margin: 0;
+        cursor: pointer;
+        position: relative;
+        background: var(--section-bg);
+        transition: all 0.2s ease;
+      }
+
+      input[type="checkbox"]:checked {
+        background: var(--primary);
+        border-color: var(--primary);
+      }
+
+      input[type="checkbox"]:checked::after {
+        content: "\2714";
+        position: absolute;
+        color: white;
+        font-size: 12px;
+        left: 2px;
+        top: 1px;
+        font-weight: bold;
+      }
+
+      input[type="checkbox"]:hover {
+        border-color: var(--primary);
+      }
+
+      input[type="checkbox"]:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.2);
+      }
+
       .section {
         margin: 16px 0;
         padding: 16px;
@@ -589,7 +628,7 @@
       <div class="split-warning"></div>
       
       <div class="section">
-        <div class="section-title">Select websites</div>
+        <div class="section-title">Select Websites</div>
         <div class="checkbox-group">
           <div class="website-item">
             <input type="checkbox" name="sites" value="grok" checked>
