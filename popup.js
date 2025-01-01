@@ -12,7 +12,16 @@ function saveSettings() {
   const smartLayoutHover = document.getElementById('smartLayoutHover').checked;
   const smartLayoutVerticalHover = document.getElementById('smartLayoutVerticalHover').checked;
   const globalDirection = document.querySelector('.split-all-button.active')?.dataset.direction || null;
-  chrome.storage.local.set({ selectedSites, selectedMode, splitDirections, smartLayoutHover, smartLayoutVerticalHover, globalDirection });
+  const autoCloseTimer = document.getElementById('autoCloseTimer').value;
+  chrome.storage.local.set({ 
+    selectedSites, 
+    selectedMode, 
+    splitDirections, 
+    smartLayoutHover, 
+    smartLayoutVerticalHover, 
+    globalDirection,
+    autoCloseTimer 
+  });
 }
 
 // Function to restore selected sites and mode
@@ -23,7 +32,15 @@ function restoreSettings() {
   });
   
   // Restore saved selections and mode
-  chrome.storage.local.get(['selectedSites', 'selectedMode', 'splitDirections', 'smartLayoutHover', 'smartLayoutVerticalHover', 'globalDirection'], (result) => {
+  chrome.storage.local.get([
+    'selectedSites', 
+    'selectedMode', 
+    'splitDirections', 
+    'smartLayoutHover', 
+    'smartLayoutVerticalHover', 
+    'globalDirection',
+    'autoCloseTimer'
+  ], (result) => {
     // Handle site selections
     if (result.selectedSites && result.selectedSites.length > 0) {
       result.selectedSites.forEach(site => {
@@ -36,6 +53,12 @@ function restoreSettings() {
         const checkbox = document.querySelector(`input[value="${site}"]`);
         if (checkbox) checkbox.checked = true;
       });
+    }
+
+    // Handle auto-close timer
+    const autoCloseTimerInput = document.getElementById('autoCloseTimer');
+    if (autoCloseTimerInput && result.autoCloseTimer) {
+      autoCloseTimerInput.value = result.autoCloseTimer;
     }
 
     // Handle half-screen hover setting
@@ -307,6 +330,14 @@ document.addEventListener('DOMContentLoaded', () => {
     shortcutElement.innerHTML = isMac ? 
       'Keyboard shortcut: <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>H</kbd>' :
       'Keyboard shortcut: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>H</kbd>';
+  }
+
+  // Add event listener for auto-close timer
+  const autoCloseTimerInput = document.getElementById('autoCloseTimer');
+  if (autoCloseTimerInput) {
+    autoCloseTimerInput.addEventListener('change', () => {
+      saveSettings();
+    });
   }
 
   // Add event listeners for half-screen hover checkboxes
@@ -633,6 +664,8 @@ async function executePrompt() {
 
   const encodedPrompt = encodeURIComponent(prompt);
   const mode = document.querySelector('input[name="mode"]:checked').value;
+  const autoCloseTimer = document.getElementById('autoCloseTimer').value;
+  const autoCloseMs = autoCloseTimer ? parseInt(autoCloseTimer) * 1000 : 0;
   
   try {
     if (mode === 'normal') {
@@ -647,14 +680,16 @@ async function executePrompt() {
           active: false // Keep the current tab active
         });
         
-        // Set a timeout to close all tabs
-        setTimeout(async () => {
-          try {
-            await chrome.tabs.remove(tab.id);
-          } catch (error) {
-            console.error(`Error closing ${site} tab:`, error);
-          }
-        }, 2000);
+        // Set a timeout to close all tabs if timer is set
+        if (autoCloseMs > 0) {
+          setTimeout(async () => {
+            try {
+              await chrome.tabs.remove(tab.id);
+            } catch (error) {
+              console.error(`Error closing ${site} tab:`, error);
+            }
+          }, autoCloseMs);
+        }
         
         return tab;
       });
@@ -673,14 +708,16 @@ async function executePrompt() {
           state: 'maximized'
         });
         
-        // Set a timeout to close the window
-        setTimeout(async () => {
-          try {
-            await chrome.windows.remove(window.id);
-          } catch (error) {
-            console.error(`Error closing ${selectedSites[0]} window:`, error);
-          }
-        }, 2000);
+        // Set a timeout to close the window if timer is set
+        if (autoCloseMs > 0) {
+          setTimeout(async () => {
+            try {
+              await chrome.windows.remove(window.id);
+            } catch (error) {
+              console.error(`Error closing ${selectedSites[0]} window:`, error);
+            }
+          }, autoCloseMs);
+        }
       } else {
         const numWindows = selectedSites.length;
         let verticalCount = 0;
@@ -717,14 +754,16 @@ async function executePrompt() {
               state: 'normal'
             });
             
-            // Set a timeout to close the window
-            setTimeout(async () => {
-              try {
-                await chrome.windows.remove(window.id);
-              } catch (error) {
-                console.error(`Error closing ${site} window:`, error);
-              }
-            }, 2000);
+            // Set a timeout to close the window if timer is set
+            if (autoCloseMs > 0) {
+              setTimeout(async () => {
+                try {
+                  await chrome.windows.remove(window.id);
+                } catch (error) {
+                  console.error(`Error closing ${site} window:`, error);
+                }
+              }, autoCloseMs);
+            }
             
             if (isVertical) {
               currentVerticalOffset += verticalWidth;

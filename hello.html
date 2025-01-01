@@ -518,6 +518,29 @@
       .error-message.visible {
         display: block;
       }
+
+      .auto-close-timer {
+        margin: 12px 0;
+      }
+
+      .auto-close-timer label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .auto-close-timer input {
+        width: 80px;
+        padding: 4px 8px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        font-size: 14px;
+      }
+
+      .auto-close-timer input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+      }
     </style>
   </head>
   <body>
@@ -592,6 +615,12 @@
           <label>
             <input type="radio" name="mode" value="split" checked>
             <span>Split Screen</span>
+          </label>
+        </div>
+        <div class="auto-close-timer">
+          <label>
+            <span>Auto-close after (seconds):</span>
+            <input type="number" id="autoCloseTimer" min="0" step="1" placeholder="Leave empty to disable">
           </label>
         </div>
         <div class="split-controls">
