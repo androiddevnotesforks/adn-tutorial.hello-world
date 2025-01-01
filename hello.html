@@ -678,6 +678,28 @@
         color: var(--text-secondary);
         margin-top: 4px;
       }
+
+      .select-all-controls {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .control-button {
+        padding: 6px 12px;
+        background: var(--section-bg);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .control-button:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--text-secondary);
+      }
     </style>
   </head>
   <body>
@@ -690,6 +712,10 @@
       
       <div class="section">
         <div class="section-title">Select Websites</div>
+        <div class="select-all-controls">
+          <button id="selectAllSites" class="control-button">Select All</button>
+          <button id="unselectAllSites" class="control-button">Unselect All</button>
+        </div>
         <div class="checkbox-group">
           <!-- Default websites will be added here dynamically -->
         </div>

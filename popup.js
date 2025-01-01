@@ -39,10 +39,11 @@ function restoreSettings() {
     'smartLayoutHover', 
     'smartLayoutVerticalHover', 
     'globalDirection',
-    'autoCloseTimer'
+    'autoCloseTimer',
+    'hasInitializedBefore'
   ], (result) => {
     // Handle site selections
-    if (result.selectedSites && result.selectedSites.length > 0) {
+    if (result.selectedSites) {
       result.selectedSites.forEach(site => {
         // Only restore selection if the site still exists
         if (URLS[site]) {
@@ -50,8 +51,8 @@ function restoreSettings() {
           if (checkbox) checkbox.checked = true;
         }
       });
-    } else {
-      // Set default selections only for sites that still exist
+    } else if (!result.hasInitializedBefore) {
+      // Set default selections only on first ever load
       const defaultSites = ['Grok', 'ChatGPT'];
       defaultSites.forEach(site => {
         if (URLS[site]) {
@@ -59,6 +60,8 @@ function restoreSettings() {
           if (checkbox) checkbox.checked = true;
         }
       });
+      // Mark that we've initialized before
+      chrome.storage.local.set({ hasInitializedBefore: true });
     }
 
     // Handle auto-close timer
@@ -707,6 +710,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         button.classList.remove('active');
       }, 1000);
     });
+  });
+
+  // Add select/unselect all functionality
+  document.getElementById('selectAllSites').addEventListener('click', () => {
+    document.querySelectorAll('input[name="sites"]').forEach(checkbox => {
+      checkbox.checked = true;
+    });
+    saveSettings();
+  });
+
+  document.getElementById('unselectAllSites').addEventListener('click', () => {
+    document.querySelectorAll('input[name="sites"]').forEach(checkbox => {
+      checkbox.checked = false;
+    });
+    saveSettings();
   });
 });
 
