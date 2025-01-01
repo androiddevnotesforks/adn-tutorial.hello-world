@@ -708,13 +708,23 @@ function toggleSplitControls(show) {
     }
   });
   
-  // Also toggle the split-all buttons visibility
+  // Toggle the split-all buttons visibility
   const splitControls = document.querySelector('.split-controls');
+  const autoCloseTimer = document.querySelector('.auto-close-timer');
+  
   if (splitControls) {
     if (show) {
       splitControls.classList.add('active');
     } else {
       splitControls.classList.remove('active');
+    }
+  }
+
+  if (autoCloseTimer) {
+    if (show) {
+      autoCloseTimer.classList.add('active');
+    } else {
+      autoCloseTimer.classList.remove('active');
     }
   }
 }

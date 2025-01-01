@@ -615,11 +615,16 @@
       }
 
       .auto-close-timer {
+        display: none;
         margin: 16px 0;
         padding: 16px;
         background: var(--section-bg);
         border-radius: var(--radius);
         border: 1px solid var(--border);
+      }
+
+      .auto-close-timer.active {
+        display: block;
       }
 
       .auto-close-timer label {
