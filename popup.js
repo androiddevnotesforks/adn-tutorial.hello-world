@@ -182,8 +182,13 @@ function initializeWebsitesUI() {
   const checkboxGroup = document.querySelector('.checkbox-group');
   checkboxGroup.innerHTML = ''; // Clear existing items
   
-  // Add all current websites
-  Object.keys(URLS).forEach(name => {
+  // Get all websites and sort them alphabetically (case-insensitive)
+  const sortedWebsites = Object.keys(URLS).sort((a, b) => 
+    a.toLowerCase().localeCompare(b.toLowerCase())
+  );
+  
+  // Add all current websites in sorted order
+  sortedWebsites.forEach(name => {
     addWebsiteToUI(name);
   });
 }
