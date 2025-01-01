@@ -201,7 +201,7 @@ function addWebsiteToUI(name, skipSaveSettings = true) {
     <div class="website-controls">
       <button class="split-control active" data-site="${name}" data-direction="vertical">Vertical</button>
       <button class="split-control" data-site="${name}" data-direction="horizontal">Horizontal</button>
-      <button class="remove-site" title="Remove this website">Remove</button>
+      <button class="remove-site" title="Remove this website">\u00D7</button>
     </div>
   `;
   
