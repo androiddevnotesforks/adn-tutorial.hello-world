@@ -135,12 +135,12 @@ function restoreSettings() {
 
 // URL mapping
 const INITIAL_DEFAULT_URLS = {
-  grok: (prompt) => `https://grok.com/chat?q=${prompt}`,
-  x: (prompt) => `https://x.com/i/grok?text=${prompt}`,
-  chatgpt: (prompt) => `https://chatgpt.com/?q=${prompt}`,
-  claude: (prompt) => `https://claude.ai/new?q=${prompt}`,
-  perplexity: (prompt) => `https://www.perplexity.ai/?q=${prompt}`,
-  google: (prompt) => `https://www.google.com/search?q=${prompt}`
+  Grok: (prompt) => `https://grok.com/chat?q=${prompt}`,
+  X: (prompt) => `https://x.com/i/grok?text=${prompt}`,
+  ChatGPT: (prompt) => `https://chatgpt.com/?q=${prompt}`,
+  Claude: (prompt) => `https://claude.ai/new?q=${prompt}`,
+  Perplexity: (prompt) => `https://www.perplexity.ai/?q=${prompt}`,
+  Google: (prompt) => `https://www.google.com/search?q=${prompt}`
 };
 
 // Initialize URLs
