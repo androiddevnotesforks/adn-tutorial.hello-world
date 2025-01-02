@@ -115,6 +115,34 @@
         color: var(--text);
       }
 
+      /* Collapsible styles only for custom website section */
+      #customWebsiteTitle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      #customWebsiteTitle::after {
+        content: "\25BC";
+        font-size: 10px;
+        transition: transform 0.2s ease;
+      }
+
+      #customWebsiteTitle.collapsed::after {
+        transform: rotate(-90deg);
+      }
+
+      .collapsible-content {
+        max-height: 1000px;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+      }
+
+      .collapsible-content.collapsed {
+        max-height: 0;
+      }
+
       .checkbox-group {
         display: flex;
         flex-direction: column;
@@ -368,6 +396,7 @@
         gap: 8px;
         align-items: center;
         width: 100%;
+        z-index: 101;
       }
 
       .info-button {
@@ -394,26 +423,40 @@
 
       .info-tooltip {
         display: none;
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: calc(100% + 4px);
+        position: fixed;
+        left: 16px;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
         background: var(--section-bg);
         border: 1px solid var(--border);
         border-radius: var(--radius);
         padding: 12px;
         font-size: 12px;
         color: var(--text);
-        z-index: 100;
+        z-index: 1000;
         box-shadow: var(--shadow);
         user-select: text;
         cursor: auto;
-        max-height: 300px;
+        max-height: 80vh;
         overflow-y: auto;
+        width: calc(100% - 32px);
       }
 
       .info-tooltip.visible {
         display: block;
+      }
+
+      /* Add overlay when tooltip is visible */
+      .info-tooltip.visible::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: -1;
       }
 
       .info-tooltip-header {
@@ -925,144 +968,146 @@
       </div>
 
       <div class="section">
-        <div class="section-title">Add Custom Website</div>
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <input type="text" id="customSiteName" placeholder="Name" />
-          <div class="info-wrapper">
-            <input type="text" id="customSiteUrl" placeholder="URL with {prompt}" />
-            <button class="info-button" title="Show examples">?</button>
-            <div class="info-tooltip">
-              <div class="info-tooltip-header">
-                <div class="info-tooltip-title">How to Add Custom Websites</div>
-                <button class="info-tooltip-close" title="Close">Close</button>
+        <div class="section-title collapsed" id="customWebsiteTitle">Add Custom Website</div>
+        <div class="collapsible-content collapsed" id="customWebsiteContent">
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <input type="text" id="customSiteName" placeholder="Name" />
+            <div class="info-wrapper">
+              <input type="text" id="customSiteUrl" placeholder="URL with {prompt}" />
+              <button class="info-button" title="Show examples">?</button>
+              <div class="info-tooltip">
+                <div class="info-tooltip-header">
+                  <div class="info-tooltip-title">How to Add Custom Websites</div>
+                  <button class="info-tooltip-close" title="Close">Close</button>
+                </div>
+                <div>Replace your search term with <span class="example-url">{prompt}</span> in the URL. Common examples:</div>
+                <ul class="example-list">
+                  <li>
+                    <strong>Grok</strong>
+                    <div class="example-url-wrapper">
+                      <span class="example-url">https://grok.com/chat?q={prompt}</span>
+                      <div class="example-buttons">
+                        <button class="copy-button" data-url="https://grok.com/chat?q={prompt}">Copy</button>
+                        <button class="add-button" data-name="Grok" data-url="https://grok.com/chat?q={prompt}">Add</button>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Grok on X</strong>
+                    <div class="example-url-wrapper">
+                      <span class="example-url">https://x.com/i/grok?text={prompt}</span>
+                      <div class="example-buttons">
+                        <button class="copy-button" data-url="https://x.com/i/grok?text={prompt}">Copy</button>
+                        <button class="add-button" data-name="Grok on X" data-url="https://x.com/i/grok?text={prompt}">Add</button>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>ChatGPT</strong>
+                    <div class="example-url-wrapper">
+                      <span class="example-url">https://chatgpt.com/?q={prompt}</span>
+                      <div class="example-buttons">
+                        <button class="copy-button" data-url="https://chatgpt.com/?q={prompt}">Copy</button>
+                        <button class="add-button" data-name="ChatGPT" data-url="https://chatgpt.com/?q={prompt}">Add</button>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Claude</strong>
+                    <div class="example-url-wrapper">
+                      <span class="example-url">https://claude.ai/new?q={prompt}</span>
+                      <div class="example-buttons">
+                        <button class="copy-button" data-url="https://claude.ai/new?q={prompt}">Copy</button>
+                        <button class="add-button" data-name="Claude" data-url="https://claude.ai/new?q={prompt}">Add</button>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Mistral</strong>
+                    <div class="example-url-wrapper">
+                      <span class="example-url">https://chat.mistral.ai/chat?q={prompt}</span>
+                      <div class="example-buttons">
+                        <button class="copy-button" data-url="https://chat.mistral.ai/chat?q={prompt}">Copy</button>
+                        <button class="add-button" data-name="Mistral" data-url="https://chat.mistral.ai/chat?q={prompt}">Add</button>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Perplexity</strong>
+                    <div class="example-url-wrapper">
+                      <span class="example-url">https://www.perplexity.ai/?q={prompt}</span>
+                      <div class="example-buttons">
+                        <button class="copy-button" data-url="https://www.perplexity.ai/?q={prompt}">Copy</button>
+                        <button class="add-button" data-name="Perplexity" data-url="https://www.perplexity.ai/?q={prompt}">Add</button>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Google</strong>
+                    <div class="example-url-wrapper">
+                      <span class="example-url">https://www.google.com/search?q={prompt}</span>
+                      <div class="example-buttons">
+                        <button class="copy-button" data-url="https://www.google.com/search?q={prompt}">Copy</button>
+                        <button class="add-button" data-name="Google" data-url="https://www.google.com/search?q={prompt}">Add</button>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Bing Search</strong>
+                    <div class="example-url-wrapper">
+                      <span class="example-url">https://www.bing.com/search?q={prompt}</span>
+                      <div class="example-buttons">
+                        <button class="copy-button" data-url="https://www.bing.com/search?q={prompt}">Copy</button>
+                        <button class="add-button" data-name="Bing" data-url="https://www.bing.com/search?q={prompt}">Add</button>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Brave Search</strong>
+                    <div class="example-url-wrapper">
+                      <span class="example-url">https://search.brave.com/search?q={prompt}</span>
+                      <div class="example-buttons">
+                        <button class="copy-button" data-url="https://search.brave.com/search?q={prompt}">Copy</button>
+                        <button class="add-button" data-name="Brave" data-url="https://search.brave.com/search?q={prompt}">Add</button>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>DuckDuckGo</strong>
+                    <div class="example-url-wrapper">
+                      <span class="example-url">https://duckduckgo.com/?q={prompt}</span>
+                      <div class="example-buttons">
+                        <button class="copy-button" data-url="https://duckduckgo.com/?q={prompt}">Copy</button>
+                        <button class="add-button" data-name="DuckDuckGo" data-url="https://duckduckgo.com/?q={prompt}">Add</button>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>You Search</strong>
+                    <div class="example-url-wrapper">
+                      <span class="example-url">https://you.com/search?q={prompt}</span>
+                      <div class="example-buttons">
+                        <button class="copy-button" data-url="https://you.com/search?q={prompt}">Copy</button>
+                        <button class="add-button" data-name="You" data-url="https://you.com/search?q={prompt}">Add</button>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Yahoo Search</strong>
+                    <div class="example-url-wrapper">
+                      <span class="example-url">https://search.yahoo.com/search?p={prompt}</span>
+                      <div class="example-buttons">
+                        <button class="copy-button" data-url="https://search.yahoo.com/search?p={prompt}">Copy</button>
+                        <button class="add-button" data-name="Yahoo" data-url="https://search.yahoo.com/search?p={prompt}">Add</button>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
               </div>
-              <div>Replace your search term with <span class="example-url">{prompt}</span> in the URL. Common examples:</div>
-              <ul class="example-list">
-                <li>
-                  <strong>Grok</strong>
-                  <div class="example-url-wrapper">
-                    <span class="example-url">https://grok.com/chat?q={prompt}</span>
-                    <div class="example-buttons">
-                      <button class="copy-button" data-url="https://grok.com/chat?q={prompt}">Copy</button>
-                      <button class="add-button" data-name="Grok" data-url="https://grok.com/chat?q={prompt}">Add</button>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <strong>Grok on X</strong>
-                  <div class="example-url-wrapper">
-                    <span class="example-url">https://x.com/i/grok?text={prompt}</span>
-                    <div class="example-buttons">
-                      <button class="copy-button" data-url="https://x.com/i/grok?text={prompt}">Copy</button>
-                      <button class="add-button" data-name="Grok on X" data-url="https://x.com/i/grok?text={prompt}">Add</button>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <strong>ChatGPT</strong>
-                  <div class="example-url-wrapper">
-                    <span class="example-url">https://chatgpt.com/?q={prompt}</span>
-                    <div class="example-buttons">
-                      <button class="copy-button" data-url="https://chatgpt.com/?q={prompt}">Copy</button>
-                      <button class="add-button" data-name="ChatGPT" data-url="https://chatgpt.com/?q={prompt}">Add</button>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <strong>Claude</strong>
-                  <div class="example-url-wrapper">
-                    <span class="example-url">https://claude.ai/new?q={prompt}</span>
-                    <div class="example-buttons">
-                      <button class="copy-button" data-url="https://claude.ai/new?q={prompt}">Copy</button>
-                      <button class="add-button" data-name="Claude" data-url="https://claude.ai/new?q={prompt}">Add</button>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <strong>Mistral</strong>
-                  <div class="example-url-wrapper">
-                    <span class="example-url">https://chat.mistral.ai/chat?q={prompt}</span>
-                    <div class="example-buttons">
-                      <button class="copy-button" data-url="https://chat.mistral.ai/chat?q={prompt}">Copy</button>
-                      <button class="add-button" data-name="Mistral" data-url="https://chat.mistral.ai/chat?q={prompt}">Add</button>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <strong>Perplexity</strong>
-                  <div class="example-url-wrapper">
-                    <span class="example-url">https://www.perplexity.ai/?q={prompt}</span>
-                    <div class="example-buttons">
-                      <button class="copy-button" data-url="https://www.perplexity.ai/?q={prompt}">Copy</button>
-                      <button class="add-button" data-name="Perplexity" data-url="https://www.perplexity.ai/?q={prompt}">Add</button>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <strong>Google</strong>
-                  <div class="example-url-wrapper">
-                    <span class="example-url">https://www.google.com/search?q={prompt}</span>
-                    <div class="example-buttons">
-                      <button class="copy-button" data-url="https://www.google.com/search?q={prompt}">Copy</button>
-                      <button class="add-button" data-name="Google" data-url="https://www.google.com/search?q={prompt}">Add</button>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <strong>Bing Search</strong>
-                  <div class="example-url-wrapper">
-                    <span class="example-url">https://www.bing.com/search?q={prompt}</span>
-                    <div class="example-buttons">
-                      <button class="copy-button" data-url="https://www.bing.com/search?q={prompt}">Copy</button>
-                      <button class="add-button" data-name="Bing" data-url="https://www.bing.com/search?q={prompt}">Add</button>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <strong>Brave Search</strong>
-                  <div class="example-url-wrapper">
-                    <span class="example-url">https://search.brave.com/search?q={prompt}</span>
-                    <div class="example-buttons">
-                      <button class="copy-button" data-url="https://search.brave.com/search?q={prompt}">Copy</button>
-                      <button class="add-button" data-name="Brave" data-url="https://search.brave.com/search?q={prompt}">Add</button>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <strong>DuckDuckGo</strong>
-                  <div class="example-url-wrapper">
-                    <span class="example-url">https://duckduckgo.com/?q={prompt}</span>
-                    <div class="example-buttons">
-                      <button class="copy-button" data-url="https://duckduckgo.com/?q={prompt}">Copy</button>
-                      <button class="add-button" data-name="DuckDuckGo" data-url="https://duckduckgo.com/?q={prompt}">Add</button>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <strong>You Search</strong>
-                  <div class="example-url-wrapper">
-                    <span class="example-url">https://you.com/search?q={prompt}</span>
-                    <div class="example-buttons">
-                      <button class="copy-button" data-url="https://you.com/search?q={prompt}">Copy</button>
-                      <button class="add-button" data-name="You" data-url="https://you.com/search?q={prompt}">Add</button>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <strong>Yahoo Search</strong>
-                  <div class="example-url-wrapper">
-                    <span class="example-url">https://search.yahoo.com/search?p={prompt}</span>
-                    <div class="example-buttons">
-                      <button class="copy-button" data-url="https://search.yahoo.com/search?p={prompt}">Copy</button>
-                      <button class="add-button" data-name="Yahoo" data-url="https://search.yahoo.com/search?p={prompt}">Add</button>
-                    </div>
-                  </div>
-                </li>
-              </ul>
             </div>
+            <button id="addCustomSite" style="margin-top: 0;">Add Website</button>
+            <div id="customSiteError" class="error-message"></div>
           </div>
-          <button id="addCustomSite" style="margin-top: 0;">Add Website</button>
-          <div id="customSiteError" class="error-message"></div>
         </div>
       </div>
 

@@ -1,5 +1,13 @@
 console.log('This is a popup!');
 
+// Initialize collapsible functionality for custom website section
+document.getElementById('customWebsiteTitle').addEventListener('click', () => {
+  const title = document.getElementById('customWebsiteTitle');
+  const content = document.getElementById('customWebsiteContent');
+  title.classList.toggle('collapsed');
+  content.classList.toggle('collapsed');
+});
+
 // Function to save selected sites and mode
 function saveSettings() {
   const selectedSites = Array.from(document.querySelectorAll('input[name="sites"]:checked'))
