@@ -30,7 +30,9 @@
     "https://x.com/*",
     "https://chatgpt.com/*",
     "https://www.perplexity.ai/*",
-    "https://www.google.com/*"
+    "https://www.google.com/*",
+    "https://yandex.com/*",
+    "https://www.youtube.com/*"
   ],
   "commands": {
     "_execute_action": {
